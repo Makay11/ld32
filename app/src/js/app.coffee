@@ -60,11 +60,10 @@ defer ->
 	generateNextSpawn = ->
 		nextSpawn = Math.random() * 2 * 1000 // 1
 
-		
 	updateEnergy = ->
 		player.updateEnergy(-1)
-		$("#energy").width(player.energy + "%")
-	
+		$(".energy").width(player.energy + "%")
+
 	update = (delta) ->
 		if not player.moving and movementQueue.length > 0
 			switch movementQueue[0]
@@ -75,9 +74,9 @@ defer ->
 			movementQueue.splice(0, 1)
 
 		player.update(delta)
-		
+
 		updateEnergy()
-		
+
 		deadEnemies = []
 
 		for enemy in enemies

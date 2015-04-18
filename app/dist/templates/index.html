@@ -6,15 +6,17 @@
     <link rel="stylesheet" type="text/css" href="/stylesheets/app.css">
   </head>
   <body>
-    <div id="energyMeter">
-      <div id="energy"></div>
-    </div>
-    <div id="scores">
-      <div id="score" class="background">
-        <p id="text">00000</p>
+    <div class="hud">
+      <div class="energyMeter">
+        <div class="energy"></div>
       </div>
-      <div id="monstersKilled" class="background">
-        <p id="text">00<img src="images/monster.png" id="monster"></p>
+      <div class="scores">
+        <div class="score">
+          <p class="text">00000</p>
+        </div>
+        <div class="monstersKilled">
+          <p class="text">000</p><img src="images/monster.png">
+        </div>
       </div>
     </div>
     <script type="text/javascript" src="/components/jquery/jquery-2.1.3.min.js"></script>

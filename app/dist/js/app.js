@@ -63,7 +63,7 @@ defer(function() {
   };
   updateEnergy = function() {
     player.updateEnergy(-1);
-    return $("#energy").width(player.energy + "%");
+    return $(".energy").width(player.energy + "%");
   };
   update = function(delta) {
     var canCollide, deadEnemies, enemy, enemyX, i, j, len, len1, playerX;
