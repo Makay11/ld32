@@ -1,5 +1,5 @@
 class Enemy
-	constructor: (renderer) ->
+	constructor: (renderer, textureURL) ->
 		@width = 1
 		@height = 1.5
 
@@ -7,7 +7,7 @@ class Enemy
 
 		@collided = false
 
-		@texture = THREE.ImageUtils.loadTexture("/images/runner.png")
+		@texture = THREE.ImageUtils.loadTexture(textureURL)
 		@texture.minFilter = THREE.LinearFilter
 		@texture.anisotropy = renderer.getMaxAnisotropy()
 
@@ -28,3 +28,11 @@ class Enemy
 		@mesh.position.x = Math.random() * 3 // 1 * 2 - 2
 		@mesh.position.y = 20
 		@collided = false
+
+class Enemy_C69 extends Enemy
+	constructor: (renderer) ->
+		super(renderer, "/images/c69.png")
+
+class Enemy_Minibot extends Enemy
+	constructor: (renderer) ->
+		super(renderer, "/images/minibot.png")

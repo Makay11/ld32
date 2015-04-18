@@ -32,13 +32,15 @@ defer ->
 	player = new Player(renderer)
 	scene.add(player.mesh)
 
-	transparentObjects = [player.mesh]
-
 	enemies = []
 
 	enemyPool = []
 
-	THREEx.Transparency.init(transparentObjects)
+	transparentObjects = [player.mesh]
+
+	addTransparentObject = (o) ->
+		transparentObjects.push(o)
+		THREEx.Transparency.init(transparentObjects)
 
 	keyCodes =
 		left: 37
@@ -106,7 +108,8 @@ defer ->
 				enemy = enemyPool.pop()
 				enemy.reset()
 			else
-				enemy = new Enemy(renderer)
+				enemy = new Enemy_C69(renderer)
+				addTransparentObject(enemy)
 			enemies.push(enemy)
 			scene.add(enemy.mesh)
 			generateNextSpawn()
