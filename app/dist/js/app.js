@@ -8,20 +8,22 @@ defer = function(f) {
 };
 
 Player = (function() {
-  function Player() {
+  function Player(renderer) {
     this.width = 1;
     this.height = 1.5;
+    this.position = 0;
+    this.moving = false;
+    this.movementSpeed = 1 / 200;
+    this.texture = THREE.ImageUtils.loadTexture("/images/runner.png");
+    this.texture.minFilter = THREE.LinearFilter;
+    this.texture.anisotropy = renderer.getMaxAnisotropy();
     this.geometry = new THREE.PlaneBufferGeometry(this.width, this.height);
     this.material = new THREE.MeshBasicMaterial({
-      color: 0xff0000,
-      side: THREE.DoubleSide
+      map: this.texture
     });
     this.mesh = new THREE.Mesh(this.geometry, this.material);
     this.mesh.position.z = this.height / 2;
     this.mesh.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2);
-    this.position = 0;
-    this.moving = false;
-    this.movementSpeed = 1 / 250;
   }
 
   Player.prototype.moveLeft = function() {
@@ -92,8 +94,9 @@ defer(function() {
   });
   plane = new THREE.Mesh(geometry, material);
   scene.add(plane);
-  player = new Player();
+  player = new Player(renderer);
   scene.add(player.mesh);
+  THREEx.Transparency.init([player.mesh]);
   keyCodes = {
     left: 37,
     right: 39
@@ -110,6 +113,7 @@ defer(function() {
     return player.update(delta);
   };
   render = function() {
+    THREEx.Transparency.update([player.mesh], camera);
     return renderer.render(scene, camera);
   };
   previousTime = 0;

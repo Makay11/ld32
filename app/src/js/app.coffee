@@ -1,20 +1,24 @@
 defer = (f) -> setTimeout -> f()
 
 class Player
-	constructor: ->
+	constructor: (renderer) ->
 		@width = 1
 		@height = 1.5
-
-		@geometry = new THREE.PlaneBufferGeometry(@width, @height)
-		@material = new THREE.MeshBasicMaterial(color: 0xff0000, side: THREE.DoubleSide)
-		@mesh = new THREE.Mesh(@geometry, @material)
-		@mesh.position.z = @height / 2
-		@mesh.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2)
 
 		@position = 0
 		@moving = false
 
-		@movementSpeed = 1 / 250
+		@movementSpeed = 1 / 200
+
+		@texture = THREE.ImageUtils.loadTexture("/images/runner.png")
+		@texture.minFilter = THREE.LinearFilter
+		@texture.anisotropy = renderer.getMaxAnisotropy()
+
+		@geometry = new THREE.PlaneBufferGeometry(@width, @height)
+		@material = new THREE.MeshBasicMaterial(map: @texture)
+		@mesh = new THREE.Mesh(@geometry, @material)
+		@mesh.position.z = @height / 2
+		@mesh.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2)
 
 	moveLeft: ->
 		if @moving then return
@@ -71,8 +75,10 @@ defer ->
 	plane = new THREE.Mesh(geometry, material)
 	scene.add(plane)
 
-	player = new Player()
+	player = new Player(renderer)
 	scene.add(player.mesh)
+
+	THREEx.Transparency.init([player.mesh])
 
 	keyCodes =
 		left: 37
@@ -89,6 +95,7 @@ defer ->
 		player.update(delta)
 
 	render = ->
+		THREEx.Transparency.update([player.mesh], camera)
 		renderer.render(scene, camera)
 
 	previousTime = 0
