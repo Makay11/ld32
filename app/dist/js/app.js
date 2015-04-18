@@ -8,7 +8,7 @@ defer = function(f) {
 };
 
 defer(function() {
-  var camera, gameLoop, geometry, height, material, plane, player, render, renderer, scene, update, width;
+  var camera, create, gameLoop, geometry, height, material, onDocumentKeyDown, plane, player, render, renderer, scene, update, width;
   width = window.innerWidth;
   height = window.innerHeight;
   renderer = new THREE.WebGLRenderer();
@@ -36,6 +36,18 @@ defer(function() {
   player.position.z = 0.5;
   player.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2);
   scene.add(player);
+  onDocumentKeyDown = function(event) {
+    var keyCode;
+    console.log(event.which);
+    keyCode = event.which;
+    switch (keyCode) {
+      case 37:
+        return player.position.x -= 1;
+      case 39:
+        return player.position.x += 1;
+    }
+  };
+  create = function() {};
   update = function() {};
   render = function() {
     return renderer.render(scene, camera);
@@ -45,5 +57,7 @@ defer(function() {
     update();
     return render();
   };
+  document.addEventListener("keydown", onDocumentKeyDown, false);
+  create();
   return gameLoop();
 });
