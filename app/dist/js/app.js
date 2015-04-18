@@ -69,7 +69,7 @@ Player = (function() {
 })();
 
 defer(function() {
-  var camera, gameLoop, geometry, height, keyCodes, material, plane, player, previousTime, render, renderer, scene, update, width;
+  var camera, gameLoop, geometry, height, keyCodes, material, plane, player, previousTime, render, renderer, scene, transparentObjects, update, width;
   renderer = new THREE.WebGLRenderer();
   width = window.innerWidth;
   height = window.innerHeight;
@@ -96,7 +96,8 @@ defer(function() {
   scene.add(plane);
   player = new Player(renderer);
   scene.add(player.mesh);
-  THREEx.Transparency.init([player.mesh]);
+  transparentObjects = [player.mesh];
+  THREEx.Transparency.init(transparentObjects);
   keyCodes = {
     left: 37,
     right: 39
@@ -113,7 +114,7 @@ defer(function() {
     return player.update(delta);
   };
   render = function() {
-    THREEx.Transparency.update([player.mesh], camera);
+    THREEx.Transparency.update(transparentObjects, camera);
     return renderer.render(scene, camera);
   };
   previousTime = 0;
