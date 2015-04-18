@@ -136,17 +136,25 @@ defer ->
 
 		deadEnemies = []
 
-		for enemy, index in enemies
+		for enemy in enemies
+			if enemy.mesh.position.y >= 0.25
+				canCollide = true
+
 			enemy.update(delta)
 
-			if enemy.mesh.position.y <= camera.position.y
-				deadEnemies.push(index)
+			if canCollide and enemy.mesh.position.y < 0.25
+				enemyX = enemy.mesh.position.x
+				playerX = player.mesh.position.x
+				if enemyX - enemy.width / 2 <= playerX + player.width / 2 and playerX - player.width / 2 <= enemyX + enemy.width / 2
+					console.log "ded"
 
-		for index in deadEnemies
-			enemy = enemies[index]
-			enemies.splice(index, 1)
-			enemyPool.push(enemy)
-			scene.remove(enemy.mesh)
+			if enemy.mesh.position.y <= camera.position.y
+				enemyPool.push(enemy)
+				scene.remove(enemy.mesh)
+				deadEnemies.push(enemy)
+
+		for enemy in deadEnemies
+			enemies.splice(enemies.indexOf(enemy), 1)
 
 		nextSpawn -= delta or 0
 		if nextSpawn <= 0

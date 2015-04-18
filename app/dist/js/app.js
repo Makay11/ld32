@@ -149,22 +149,31 @@ defer(function() {
     return nextSpawn = Math.floor(Math.random() * 2 * 1000 / 1);
   };
   update = function(delta) {
-    var deadEnemies, enemy, i, index, j, len, len1;
+    var canCollide, deadEnemies, enemy, enemyX, i, j, len, len1, playerX;
     player.update(delta);
     deadEnemies = [];
-    for (index = i = 0, len = enemies.length; i < len; index = ++i) {
-      enemy = enemies[index];
+    for (i = 0, len = enemies.length; i < len; i++) {
+      enemy = enemies[i];
+      if (enemy.mesh.position.y >= 0.25) {
+        canCollide = true;
+      }
       enemy.update(delta);
+      if (canCollide && enemy.mesh.position.y < 0.25) {
+        enemyX = enemy.mesh.position.x;
+        playerX = player.mesh.position.x;
+        if (enemyX - enemy.width / 2 <= playerX + player.width / 2 && playerX - player.width / 2 <= enemyX + enemy.width / 2) {
+          console.log("ded");
+        }
+      }
       if (enemy.mesh.position.y <= camera.position.y) {
-        deadEnemies.push(index);
+        enemyPool.push(enemy);
+        scene.remove(enemy.mesh);
+        deadEnemies.push(enemy);
       }
     }
     for (j = 0, len1 = deadEnemies.length; j < len1; j++) {
-      index = deadEnemies[j];
-      enemy = enemies[index];
-      enemies.splice(index, 1);
-      enemyPool.push(enemy);
-      scene.remove(enemy.mesh);
+      enemy = deadEnemies[j];
+      enemies.splice(enemies.indexOf(enemy), 1);
     }
     nextSpawn -= delta || 0;
     if (nextSpawn <= 0) {
