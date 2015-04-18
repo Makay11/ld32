@@ -41,7 +41,7 @@ defer ->
 	THREEx.Transparency.init(transparentObjects)
 
 	addTransparentObject = (o) ->
-		transparentObjects.push(o)
+		transparentObjects.push(o.mesh)
 		THREEx.Transparency.init(transparentObjects)
 
 	keyCodes =
