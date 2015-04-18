@@ -45,6 +45,22 @@ class Player
 					@mesh.position.x = @position
 					@moving = false
 
+class Enemy
+	constructor: (renderer) ->
+		@width = 1
+		@height = 1.5
+
+		@texture = THREE.ImageUtils.loadTexture("/images/runner.png")
+		@texture.minFilter = THREE.LinearFilter
+		@texture.anisotropy = renderer.getMaxAnisotropy()
+
+		@geometry = new THREE.PlaneBufferGeometry(@width, @height)
+		@material = new THREE.MeshBasicMaterial(map: @texture)
+		@mesh = new THREE.Mesh(@geometry, @material)
+		@mesh.position.x = Math.random() * 3 // 1 * 2 - 2
+		@mesh.position.y = 20
+		@mesh.position.z = @height / 2
+		@mesh.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2)
 
 defer ->
 	renderer = new THREE.WebGLRenderer()
@@ -78,6 +94,8 @@ defer ->
 	player = new Player(renderer)
 	scene.add(player.mesh)
 
+	scene.add(new Enemy(renderer).mesh);
+
 	transparentObjects = [player.mesh]
 
 	THREEx.Transparency.init(transparentObjects)
@@ -97,7 +115,7 @@ defer ->
 		player.update(delta)
 
 	render = ->
-		THREEx.Transparency.update(transparentObjects, camera)
+		#THREEx.Transparency.update(transparentObjects, camera)
 		renderer.render(scene, camera)
 
 	previousTime = 0
