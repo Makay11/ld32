@@ -73,6 +73,7 @@ Enemy = (function() {
     this.width = 1;
     this.height = 1.5;
     this.movementSpeed = 3 / 1000;
+    this.collided = false;
     this.texture = THREE.ImageUtils.loadTexture("/images/runner.png");
     this.texture.minFilter = THREE.LinearFilter;
     this.texture.anisotropy = renderer.getMaxAnisotropy();
@@ -93,7 +94,8 @@ Enemy = (function() {
 
   Enemy.prototype.reset = function() {
     this.mesh.position.x = Math.floor(Math.random() * 3 / 1) * 2 - 2;
-    return this.mesh.position.y = 20;
+    this.mesh.position.y = 20;
+    return this.collided = false;
   };
 
   return Enemy;
@@ -154,7 +156,7 @@ defer(function() {
     deadEnemies = [];
     for (i = 0, len = enemies.length; i < len; i++) {
       enemy = enemies[i];
-      if (enemy.mesh.position.y >= 0.25) {
+      if (!enemy.collided && enemy.mesh.position.y > 0) {
         canCollide = true;
       }
       enemy.update(delta);
@@ -162,6 +164,7 @@ defer(function() {
         enemyX = enemy.mesh.position.x;
         playerX = player.mesh.position.x;
         if (enemyX - enemy.width / 2 <= playerX + player.width / 2 && playerX - player.width / 2 <= enemyX + enemy.width / 2) {
+          enemy.collided = true;
           console.log("ded");
         }
       }

@@ -54,6 +54,8 @@ class Enemy
 
 		@movementSpeed = 3 / 1000
 
+		@collided = false
+
 		@texture = THREE.ImageUtils.loadTexture("/images/runner.png")
 		@texture.minFilter = THREE.LinearFilter
 		@texture.anisotropy = renderer.getMaxAnisotropy()
@@ -74,6 +76,7 @@ class Enemy
 	reset: ->
 		@mesh.position.x = Math.random() * 3 // 1 * 2 - 2
 		@mesh.position.y = 20
+		@collided = false
 
 defer ->
 	renderer = new THREE.WebGLRenderer()
@@ -137,7 +140,7 @@ defer ->
 		deadEnemies = []
 
 		for enemy in enemies
-			if enemy.mesh.position.y >= 0.25
+			if not enemy.collided and enemy.mesh.position.y > 0
 				canCollide = true
 
 			enemy.update(delta)
@@ -146,6 +149,7 @@ defer ->
 				enemyX = enemy.mesh.position.x
 				playerX = player.mesh.position.x
 				if enemyX - enemy.width / 2 <= playerX + player.width / 2 and playerX - player.width / 2 <= enemyX + enemy.width / 2
+					enemy.collided = true
 					console.log "ded"
 
 			if enemy.mesh.position.y <= camera.position.y
