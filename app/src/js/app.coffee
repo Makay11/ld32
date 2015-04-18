@@ -21,7 +21,15 @@ class Player
 		@mesh.position.z = @height / 2
 
 		@mesh.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2)
+		
+		@energy = 100 
 
+	
+	updateEnergy: (value) ->
+		if @energy <= 10
+			return
+		@energy += value
+	
 	moveLeft: ->
 		if @moving then return
 		if @position > -1
@@ -131,9 +139,16 @@ defer ->
 	generateNextSpawn = ->
 		nextSpawn = Math.random() * 2 * 1000 // 1
 
+		
+	updateEnergy = ->
+		player.updateEnergy(-1)
+		$("#energy").width(player.energy + "%")
+	
 	update = (delta) ->
 		player.update(delta)
-
+		
+		updateEnergy()
+		
 		deadEnemies = []
 
 		for enemy, index in enemies

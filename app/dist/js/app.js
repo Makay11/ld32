@@ -24,7 +24,15 @@ Player = (function() {
     this.mesh = new THREE.Mesh(this.geometry, this.material);
     this.mesh.position.z = this.height / 2;
     this.mesh.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2);
+    this.energy = 100;
   }
+
+  Player.prototype.updateEnergy = function(value) {
+    if (this.energy <= 10) {
+      return;
+    }
+    return this.energy += value;
+  };
 
   Player.prototype.moveLeft = function() {
     if (this.moving) {
@@ -101,7 +109,7 @@ Enemy = (function() {
 })();
 
 defer(function() {
-  var camera, enemies, enemyPool, gameLoop, generateNextSpawn, geometry, height, keyCodes, material, nextSpawn, plane, player, previousTime, render, renderer, scene, transparentObjects, update, width;
+  var camera, enemies, enemyPool, gameLoop, generateNextSpawn, geometry, height, keyCodes, material, nextSpawn, plane, player, previousTime, render, renderer, scene, transparentObjects, update, updateEnergy, width;
   renderer = new THREE.WebGLRenderer();
   width = window.innerWidth;
   height = window.innerHeight;
@@ -148,9 +156,14 @@ defer(function() {
   generateNextSpawn = function() {
     return nextSpawn = Math.floor(Math.random() * 2 * 1000 / 1);
   };
+  updateEnergy = function() {
+    player.updateEnergy(-1);
+    return $("#energy").width(player.energy + "%");
+  };
   update = function(delta) {
     var deadEnemies, enemy, i, index, j, len, len1;
     player.update(delta);
+    updateEnergy();
     deadEnemies = [];
     for (index = i = 0, len = enemies.length; i < len; index = ++i) {
       enemy = enemies[index];
