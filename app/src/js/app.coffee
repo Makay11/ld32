@@ -2,12 +2,13 @@ defer = (f) -> setTimeout -> f()
 
 class Player
 	constructor: ->
-		@geometry = new THREE.PlaneBufferGeometry(0.7, 1.5)
+		@width = 1
+		@height = 1.5
+
+		@geometry = new THREE.PlaneBufferGeometry(@width, @height)
 		@material = new THREE.MeshBasicMaterial(color: 0xff0000, side: THREE.DoubleSide)
 		@mesh = new THREE.Mesh(@geometry, @material)
-		@mesh.position.x = 0
-		@mesh.position.y = 1.5
-		@mesh.position.z = 1.5 / 2
+		@mesh.position.z = @height / 2
 		@mesh.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2)
 
 		@position = 0
@@ -29,14 +30,14 @@ class Player
 		if @moving
 			if @moving == "left"
 				@mesh.position.x -= @movementSpeed * delta
-				if @mesh.position.x <= @position - 1
-					@position = @position - 1
+				if @mesh.position.x <= @position - 2
+					@position = @position - 2
 					@mesh.position.x = @position
 					@moving = false
 			else if @moving == "right"
 				@mesh.position.x += @movementSpeed * delta
-				if @mesh.position.x >= @position + 1
-					@position = @position + 1
+				if @mesh.position.x >= @position + 2
+					@position = @position + 2
 					@mesh.position.x = @position
 					@moving = false
 
@@ -52,8 +53,9 @@ defer ->
 
 	camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000)
 
+	camera.position.y = -2.5
 	camera.position.z = 2
-	camera.lookAt(new THREE.Vector3(0, 5, 0))
+	camera.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2.2)
 
 	$(window).on "resize", ->
 		width = window.innerWidth
@@ -64,7 +66,7 @@ defer ->
 
 	scene = new THREE.Scene()
 
-	geometry = new THREE.PlaneBufferGeometry(3, 1000)
+	geometry = new THREE.PlaneBufferGeometry(6, 1000)
 	material = new THREE.MeshBasicMaterial({color: 0xffff00, side: THREE.DoubleSide})
 	plane = new THREE.Mesh(geometry, material)
 	scene.add(plane)
