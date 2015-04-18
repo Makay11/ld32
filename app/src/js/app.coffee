@@ -78,7 +78,9 @@ defer ->
 	player = new Player(renderer)
 	scene.add(player.mesh)
 
-	THREEx.Transparency.init([player.mesh])
+	transparentObjects = [player.mesh]
+
+	THREEx.Transparency.init(transparentObjects)
 
 	keyCodes =
 		left: 37
@@ -95,7 +97,7 @@ defer ->
 		player.update(delta)
 
 	render = ->
-		THREEx.Transparency.update([player.mesh], camera)
+		THREEx.Transparency.update(transparentObjects, camera)
 		renderer.render(scene, camera)
 
 	previousTime = 0
