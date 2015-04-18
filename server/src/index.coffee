@@ -1,8 +1,6 @@
 exec = require("child_process").exec
 spawn = require("child_process").spawn
 Hapi = require("hapi")
-req = require("request")
-Storage = require("node-storage")
 
 IS_DEV = process.argv[2]
 
