@@ -74,10 +74,6 @@ defer ->
 	player = new Player()
 	scene.add(player.mesh)
 
-	keyboard = new THREEx.KeyboardState()
-
-	keys = {}
-
 	keyCodes =
 		left: 37
 		right: 39
@@ -99,7 +95,10 @@ defer ->
 
 	gameLoop = (time) ->
 		requestAnimationFrame(gameLoop)
+
 		delta = time - previousTime
+		previousTime = time
+
 		update(delta)
 		render()
 

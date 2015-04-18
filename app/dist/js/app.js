@@ -67,7 +67,7 @@ Player = (function() {
 })();
 
 defer(function() {
-  var camera, gameLoop, geometry, height, keyCodes, keyboard, keys, material, plane, player, previousTime, render, renderer, scene, update, width;
+  var camera, gameLoop, geometry, height, keyCodes, material, plane, player, previousTime, render, renderer, scene, update, width;
   renderer = new THREE.WebGLRenderer();
   width = window.innerWidth;
   height = window.innerHeight;
@@ -94,8 +94,6 @@ defer(function() {
   scene.add(plane);
   player = new Player();
   scene.add(player.mesh);
-  keyboard = new THREEx.KeyboardState();
-  keys = {};
   keyCodes = {
     left: 37,
     right: 39
@@ -119,6 +117,7 @@ defer(function() {
     var delta;
     requestAnimationFrame(gameLoop);
     delta = time - previousTime;
+    previousTime = time;
     update(delta);
     return render();
   };
