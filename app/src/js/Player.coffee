@@ -11,11 +11,6 @@ class Player extends Entity
 
 		@movementSpeed = 1 / 200
 
-	updateEnergy: (value) ->
-		if @energy <= 0
-			return
-		@energy += value
-
 	moveLeft: ->
 		if @moving then return
 		if @position > -1
@@ -40,3 +35,15 @@ class Player extends Entity
 					@position = @position + 2
 					@mesh.position.x = @position
 					@moving = false
+
+		@updateEnergy(-1)
+
+	updateEnergy: (value) ->
+		@energy += value
+
+		if @energy > 100
+			@energy = 100
+		else if @energy < 0
+			@energy = 0
+
+		$(".energy").width(@energy + "%")

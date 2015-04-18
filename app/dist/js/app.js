@@ -10,7 +10,7 @@ defer = function(f) {
 };
 
 defer(function() {
-  var addTransparentObject, camera, enemies, enemyPool, gameLoop, generateNextSpawn, geometry, height, keyCodes, material, movementQueue, nextSpawn, plane, player, previousTime, render, renderer, scene, transparentObjects, update, updateEnergy, width;
+  var addTransparentObject, camera, enemies, enemyPool, gameLoop, generateNextSpawn, geometry, height, keyCodes, material, movementQueue, nextSpawn, plane, player, previousTime, render, renderer, scene, transparentObjects, update, width;
   renderer = new THREE.WebGLRenderer();
   width = window.innerWidth;
   height = window.innerHeight;
@@ -67,10 +67,6 @@ defer(function() {
   generateNextSpawn = function() {
     return nextSpawn = Math.floor(Math.random() * 2 * 1000 / 1);
   };
-  updateEnergy = function() {
-    player.updateEnergy(-1);
-    return $(".energy").width(player.energy + "%");
-  };
   update = function(delta) {
     var canCollide, deadEnemies, enemy, enemyX, i, j, len, len1, playerX;
     if (!player.moving && movementQueue.length > 0) {
@@ -84,7 +80,6 @@ defer(function() {
       movementQueue.splice(0, 1);
     }
     player.update(delta);
-    updateEnergy();
     deadEnemies = [];
     for (i = 0, len = enemies.length; i < len; i++) {
       enemy = enemies[i];
@@ -175,13 +170,6 @@ Player = (function(superClass) {
     this.movementSpeed = 1 / 200;
   }
 
-  Player.prototype.updateEnergy = function(value) {
-    if (this.energy <= 0) {
-      return;
-    }
-    return this.energy += value;
-  };
-
   Player.prototype.moveLeft = function() {
     if (this.moving) {
       return;
@@ -207,17 +195,28 @@ Player = (function(superClass) {
         if (this.mesh.position.x <= this.position - 2) {
           this.position = this.position - 2;
           this.mesh.position.x = this.position;
-          return this.moving = false;
+          this.moving = false;
         }
       } else if (this.moving === "right") {
         this.mesh.position.x += this.movementSpeed * delta;
         if (this.mesh.position.x >= this.position + 2) {
           this.position = this.position + 2;
           this.mesh.position.x = this.position;
-          return this.moving = false;
+          this.moving = false;
         }
       }
     }
+    return this.updateEnergy(-1);
+  };
+
+  Player.prototype.updateEnergy = function(value) {
+    this.energy += value;
+    if (this.energy > 100) {
+      this.energy = 100;
+    } else if (this.energy < 0) {
+      this.energy = 0;
+    }
+    return $(".energy").width(this.energy + "%");
   };
 
   return Player;
