@@ -76,21 +76,20 @@ defer ->
 
 	keyboard = new THREEx.KeyboardState()
 
-	wasPressed = left: false, right: false
+	keys = {}
 
-	update = (delta) ->
-		if left = keyboard.pressed("left")
-			if not wasPressed.left and not player.moving
+	keyCodes =
+		left: 37
+		right: 39
+
+	$(document).on "keydown", (event) ->
+		switch event.keyCode
+			when keyCodes.left
 				player.moveLeft()
-
-		wasPressed.left = left
-
-		if right = keyboard.pressed("right")
-			if not wasPressed.right and not player.moving
+			when keyCodes.right
 				player.moveRight()
 
-		wasPressed.right = right
-
+	update = (delta) ->
 		player.update(delta)
 
 	render = ->

@@ -67,7 +67,7 @@ Player = (function() {
 })();
 
 defer(function() {
-  var camera, gameLoop, geometry, height, keyboard, material, plane, player, previousTime, render, renderer, scene, update, wasPressed, width;
+  var camera, gameLoop, geometry, height, keyCodes, keyboard, keys, material, plane, player, previousTime, render, renderer, scene, update, width;
   renderer = new THREE.WebGLRenderer();
   width = window.innerWidth;
   height = window.innerHeight;
@@ -95,24 +95,20 @@ defer(function() {
   player = new Player();
   scene.add(player.mesh);
   keyboard = new THREEx.KeyboardState();
-  wasPressed = {
-    left: false,
-    right: false
+  keys = {};
+  keyCodes = {
+    left: 37,
+    right: 39
   };
+  $(document).on("keydown", function(event) {
+    switch (event.keyCode) {
+      case keyCodes.left:
+        return player.moveLeft();
+      case keyCodes.right:
+        return player.moveRight();
+    }
+  });
   update = function(delta) {
-    var left, right;
-    if (left = keyboard.pressed("left")) {
-      if (!wasPressed.left && !player.moving) {
-        player.moveLeft();
-      }
-    }
-    wasPressed.left = left;
-    if (right = keyboard.pressed("right")) {
-      if (!wasPressed.right && !player.moving) {
-        player.moveRight();
-      }
-    }
-    wasPressed.right = right;
     return player.update(delta);
   };
   render = function() {
