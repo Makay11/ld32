@@ -9,15 +9,15 @@ defer = function(f) {
 
 Player = (function() {
   function Player() {
-    this.geometry = new THREE.PlaneBufferGeometry(0.7, 1.5);
+    this.width = 1;
+    this.height = 1.5;
+    this.geometry = new THREE.PlaneBufferGeometry(this.width, this.height);
     this.material = new THREE.MeshBasicMaterial({
       color: 0xff0000,
       side: THREE.DoubleSide
     });
     this.mesh = new THREE.Mesh(this.geometry, this.material);
-    this.mesh.position.x = 0;
-    this.mesh.position.y = 1.5;
-    this.mesh.position.z = 1.5 / 2;
+    this.mesh.position.z = this.height / 2;
     this.mesh.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2);
     this.position = 0;
     this.moving = false;
@@ -46,15 +46,15 @@ Player = (function() {
     if (this.moving) {
       if (this.moving === "left") {
         this.mesh.position.x -= this.movementSpeed * delta;
-        if (this.mesh.position.x <= this.position - 1) {
-          this.position = this.position - 1;
+        if (this.mesh.position.x <= this.position - 2) {
+          this.position = this.position - 2;
           this.mesh.position.x = this.position;
           return this.moving = false;
         }
       } else if (this.moving === "right") {
         this.mesh.position.x += this.movementSpeed * delta;
-        if (this.mesh.position.x >= this.position + 1) {
-          this.position = this.position + 1;
+        if (this.mesh.position.x >= this.position + 2) {
+          this.position = this.position + 2;
           this.mesh.position.x = this.position;
           return this.moving = false;
         }
@@ -74,8 +74,9 @@ defer(function() {
   renderer.setSize(width, height - 4);
   $("body").append(renderer.domElement);
   camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+  camera.position.y = -2.5;
   camera.position.z = 2;
-  camera.lookAt(new THREE.Vector3(0, 5, 0));
+  camera.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2.2);
   $(window).on("resize", function() {
     width = window.innerWidth;
     height = window.innerHeight;
@@ -84,7 +85,7 @@ defer(function() {
     return camera.updateProjectionMatrix();
   });
   scene = new THREE.Scene();
-  geometry = new THREE.PlaneBufferGeometry(3, 1000);
+  geometry = new THREE.PlaneBufferGeometry(6, 1000);
   material = new THREE.MeshBasicMaterial({
     color: 0xffff00,
     side: THREE.DoubleSide
