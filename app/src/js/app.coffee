@@ -17,7 +17,9 @@ class Player
 		@geometry = new THREE.PlaneBufferGeometry(@width, @height)
 		@material = new THREE.MeshBasicMaterial(map: @texture)
 		@mesh = new THREE.Mesh(@geometry, @material)
+
 		@mesh.position.z = @height / 2
+
 		@mesh.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2)
 
 	moveLeft: ->
@@ -50,6 +52,8 @@ class Enemy
 		@width = 1
 		@height = 1.5
 
+		@movementSpeed = 3 / 1000
+
 		@texture = THREE.ImageUtils.loadTexture("/images/runner.png")
 		@texture.minFilter = THREE.LinearFilter
 		@texture.anisotropy = renderer.getMaxAnisotropy()
@@ -57,10 +61,19 @@ class Enemy
 		@geometry = new THREE.PlaneBufferGeometry(@width, @height)
 		@material = new THREE.MeshBasicMaterial(map: @texture)
 		@mesh = new THREE.Mesh(@geometry, @material)
+
 		@mesh.position.x = Math.random() * 3 // 1 * 2 - 2
 		@mesh.position.y = 20
 		@mesh.position.z = @height / 2
+
 		@mesh.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2)
+
+	update: (delta) ->
+		@mesh.position.y -= @movementSpeed * delta
+
+	reset: ->
+		@mesh.position.x = Math.random() * 3 // 1 * 2 - 2
+		@mesh.position.y = 20
 
 defer ->
 	renderer = new THREE.WebGLRenderer()
@@ -94,9 +107,11 @@ defer ->
 	player = new Player(renderer)
 	scene.add(player.mesh)
 
-	scene.add(new Enemy(renderer).mesh);
-
 	transparentObjects = [player.mesh]
+
+	enemies = []
+
+	enemyPool = []
 
 	THREEx.Transparency.init(transparentObjects)
 
@@ -111,8 +126,38 @@ defer ->
 			when keyCodes.right
 				player.moveRight()
 
+	nextSpawn = 0
+
+	generateNextSpawn = ->
+		nextSpawn = Math.random() * 2 * 1000 // 1
+
 	update = (delta) ->
 		player.update(delta)
+
+		deadEnemies = []
+
+		for enemy, index in enemies
+			enemy.update(delta)
+
+			if enemy.mesh.position.y <= camera.position.y
+				deadEnemies.push(index)
+
+		for index in deadEnemies
+			enemy = enemies[index]
+			enemies.splice(index, 1)
+			enemyPool.push(enemy)
+			scene.remove(enemy.mesh)
+
+		nextSpawn -= delta or 0
+		if nextSpawn <= 0
+			if enemyPool.length > 0
+				enemy = enemyPool.pop()
+				enemy.reset()
+			else
+				enemy = new Enemy(renderer)
+			enemies.push(enemy)
+			scene.add(enemy.mesh)
+			generateNextSpawn()
 
 	render = ->
 		#THREEx.Transparency.update(transparentObjects, camera)

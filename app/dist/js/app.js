@@ -72,6 +72,7 @@ Enemy = (function() {
   function Enemy(renderer) {
     this.width = 1;
     this.height = 1.5;
+    this.movementSpeed = 3 / 1000;
     this.texture = THREE.ImageUtils.loadTexture("/images/runner.png");
     this.texture.minFilter = THREE.LinearFilter;
     this.texture.anisotropy = renderer.getMaxAnisotropy();
@@ -86,12 +87,21 @@ Enemy = (function() {
     this.mesh.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2);
   }
 
+  Enemy.prototype.update = function(delta) {
+    return this.mesh.position.y -= this.movementSpeed * delta;
+  };
+
+  Enemy.prototype.reset = function() {
+    this.mesh.position.x = Math.floor(Math.random() * 3 / 1) * 2 - 2;
+    return this.mesh.position.y = 20;
+  };
+
   return Enemy;
 
 })();
 
 defer(function() {
-  var camera, gameLoop, geometry, height, keyCodes, material, plane, player, previousTime, render, renderer, scene, transparentObjects, update, width;
+  var camera, enemies, enemyPool, gameLoop, generateNextSpawn, geometry, height, keyCodes, material, nextSpawn, plane, player, previousTime, render, renderer, scene, transparentObjects, update, width;
   renderer = new THREE.WebGLRenderer();
   width = window.innerWidth;
   height = window.innerHeight;
@@ -118,8 +128,9 @@ defer(function() {
   scene.add(plane);
   player = new Player(renderer);
   scene.add(player.mesh);
-  scene.add(new Enemy(renderer).mesh);
   transparentObjects = [player.mesh];
+  enemies = [];
+  enemyPool = [];
   THREEx.Transparency.init(transparentObjects);
   keyCodes = {
     left: 37,
@@ -133,8 +144,40 @@ defer(function() {
         return player.moveRight();
     }
   });
+  nextSpawn = 0;
+  generateNextSpawn = function() {
+    return nextSpawn = Math.floor(Math.random() * 2 * 1000 / 1);
+  };
   update = function(delta) {
-    return player.update(delta);
+    var deadEnemies, enemy, i, index, j, len, len1;
+    player.update(delta);
+    deadEnemies = [];
+    for (index = i = 0, len = enemies.length; i < len; index = ++i) {
+      enemy = enemies[index];
+      enemy.update(delta);
+      if (enemy.mesh.position.y <= camera.position.y) {
+        deadEnemies.push(index);
+      }
+    }
+    for (j = 0, len1 = deadEnemies.length; j < len1; j++) {
+      index = deadEnemies[j];
+      enemy = enemies[index];
+      enemies.splice(index, 1);
+      enemyPool.push(enemy);
+      scene.remove(enemy.mesh);
+    }
+    nextSpawn -= delta || 0;
+    if (nextSpawn <= 0) {
+      if (enemyPool.length > 0) {
+        enemy = enemyPool.pop();
+        enemy.reset();
+      } else {
+        enemy = new Enemy(renderer);
+      }
+      enemies.push(enemy);
+      scene.add(enemy.mesh);
+      return generateNextSpawn();
+    }
   };
   render = function() {
     return renderer.render(scene, camera);
