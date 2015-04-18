@@ -1,5 +1,46 @@
 defer = (f) -> setTimeout -> f()
 
+class Player
+	constructor: ->
+		@geometry = new THREE.PlaneBufferGeometry(0.7, 1.5)
+		@material = new THREE.MeshBasicMaterial(color: 0xff0000, side: THREE.DoubleSide)
+		@mesh = new THREE.Mesh(@geometry, @material)
+		@mesh.position.x = 0
+		@mesh.position.y = 1.5
+		@mesh.position.z = 1.5 / 2
+		@mesh.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2)
+
+		@position = 0
+		@moving = false
+
+		@movementSpeed = 1 / 250
+
+	moveLeft: ->
+		if @moving then return
+		if @position > -1
+			@moving = "left"
+
+	moveRight: ->
+		if @moving then return
+		if @position < 1
+			@moving = "right"
+
+	update: (delta) ->
+		if @moving
+			if @moving == "left"
+				@mesh.position.x -= @movementSpeed * delta
+				if @mesh.position.x <= @position - 1
+					@position = @position - 1
+					@mesh.position.x = @position
+					@moving = false
+			else if @moving == "right"
+				@mesh.position.x += @movementSpeed * delta
+				if @mesh.position.x >= @position + 1
+					@position = @position + 1
+					@mesh.position.x = @position
+					@moving = false
+
+
 defer ->
 	renderer = new THREE.WebGLRenderer()
 
@@ -12,7 +53,7 @@ defer ->
 	camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000)
 
 	camera.position.z = 2
-	camera.lookAt(new THREE.Vector3(0, 10, 0))
+	camera.lookAt(new THREE.Vector3(0, 5, 0))
 
 	$(window).on "resize", ->
 		width = window.innerWidth
@@ -23,28 +64,42 @@ defer ->
 
 	scene = new THREE.Scene()
 
-	geometry = new THREE.PlaneBufferGeometry(5, 1000)
+	geometry = new THREE.PlaneBufferGeometry(3, 1000)
 	material = new THREE.MeshBasicMaterial({color: 0xffff00, side: THREE.DoubleSide})
 	plane = new THREE.Mesh(geometry, material)
 	scene.add(plane)
 
-	geometry = new THREE.PlaneBufferGeometry(0.7, 2)
-	material = new THREE.MeshBasicMaterial({color: 0xff0000, side: THREE.DoubleSide})
-	player = new THREE.Mesh(geometry, material)
-	player.position.x = 0
-	player.position.y = 2
-	player.position.z = 0.5
-	player.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2)
-	scene.add(player)
+	player = new Player()
+	scene.add(player.mesh)
 
-	update = ->
+	keyboard = new THREEx.KeyboardState()
+
+	wasPressed = left: false, right: false
+
+	update = (delta) ->
+		if left = keyboard.pressed("left")
+			if not wasPressed.left and not player.moving
+				player.moveLeft()
+
+		wasPressed.left = left
+
+		if right = keyboard.pressed("right")
+			if not wasPressed.right and not player.moving
+				player.moveRight()
+
+		wasPressed.right = right
+
+		player.update(delta)
 
 	render = ->
 		renderer.render(scene, camera)
 
-	gameLoop = ->
+	previousTime = 0
+
+	gameLoop = (time) ->
 		requestAnimationFrame(gameLoop)
-		update()
+		delta = time - previousTime
+		update(delta)
 		render()
 
 	gameLoop()
