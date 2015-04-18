@@ -38,6 +38,8 @@ defer ->
 
 	transparentObjects = [player.mesh]
 
+	THREEx.Transparency.init(transparentObjects)
+
 	addTransparentObject = (o) ->
 		transparentObjects.push(o)
 		THREEx.Transparency.init(transparentObjects)
@@ -115,7 +117,7 @@ defer ->
 			generateNextSpawn()
 
 	render = ->
-		#THREEx.Transparency.update(transparentObjects, camera)
+		THREEx.Transparency.update(transparentObjects, camera)
 		renderer.render(scene, camera)
 
 	previousTime = 0

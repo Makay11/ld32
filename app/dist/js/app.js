@@ -40,6 +40,7 @@ defer(function() {
   enemies = [];
   enemyPool = [];
   transparentObjects = [player.mesh];
+  THREEx.Transparency.init(transparentObjects);
   addTransparentObject = function(o) {
     transparentObjects.push(o);
     return THREEx.Transparency.init(transparentObjects);
@@ -124,6 +125,7 @@ defer(function() {
     }
   };
   render = function() {
+    THREEx.Transparency.update(transparentObjects, camera);
     return renderer.render(scene, camera);
   };
   previousTime = 0;
