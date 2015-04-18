@@ -49,10 +49,10 @@ defer ->
 	$(document).on "keydown", (event) ->
 		switch event.keyCode
 			when keyCodes.left
-				if not (player.position == 0 and player.moving == "left")
+				if movementQueue.length < 2 and not (player.position == 0 and player.moving == "left")
 					movementQueue.push("left")
 			when keyCodes.right
-				if not (player.position == 0 and player.moving == "right")
+				if movementQueue.length < 2 and not (player.position == 0 and player.moving == "right")
 					movementQueue.push("right")
 
 	nextSpawn = 0

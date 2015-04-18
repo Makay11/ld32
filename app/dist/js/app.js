@@ -47,12 +47,12 @@ defer(function() {
   $(document).on("keydown", function(event) {
     switch (event.keyCode) {
       case keyCodes.left:
-        if (!(player.position === 0 && player.moving === "left")) {
+        if (movementQueue.length < 2 && !(player.position === 0 && player.moving === "left")) {
           return movementQueue.push("left");
         }
         break;
       case keyCodes.right:
-        if (!(player.position === 0 && player.moving === "right")) {
+        if (movementQueue.length < 2 && !(player.position === 0 && player.moving === "right")) {
           return movementQueue.push("right");
         }
     }
