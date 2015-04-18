@@ -1,56 +1,50 @@
 defer = (f) -> setTimeout -> f()
 
 defer ->
-  width = window.innerWidth
-  height = window.innerHeight
+	renderer = new THREE.WebGLRenderer()
 
-  renderer = new THREE.WebGLRenderer()
-  renderer.setSize(width, height - 4)
-  document.body.appendChild(renderer.domElement)
+	width = window.innerWidth
+	height = window.innerHeight
+	renderer.setSize(width, height - 4)
 
-  camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000)
+	$("body").append(renderer.domElement)
 
-  camera.position.z = 2
-  camera.lookAt(new THREE.Vector3(0, 10, 0))
+	camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000)
 
-  scene = new THREE.Scene()
+	camera.position.z = 2
+	camera.lookAt(new THREE.Vector3(0, 10, 0))
 
-  geometry = new THREE.PlaneBufferGeometry(5, 1000)
-  material = new THREE.MeshBasicMaterial({color: 0xffff00, side: THREE.DoubleSide})
-  plane = new THREE.Mesh(geometry, material)
-  scene.add(plane)
+	$(window).on "resize", ->
+		width = window.innerWidth
+		height = window.innerHeight
+		renderer.setSize(width, height - 4)
+		camera.aspect = width / height
+		camera.updateProjectionMatrix()
 
-  geometry = new THREE.PlaneBufferGeometry(0.7, 2)
-  material = new THREE.MeshBasicMaterial({color: 0xff0000, side: THREE.DoubleSide})
-  player = new THREE.Mesh(geometry, material)
-  player.position.x = 0
-  player.position.y = 2
-  player.position.z = 0.5
-  player.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2)
-  scene.add(player)
-    
-  onDocumentKeyDown = (event) -> 
-    console.log(event.which); 
-    keyCode = event.which
+	scene = new THREE.Scene()
 
-    switch keyCode
-        when 37
-            player.position.x -= 1;
-        when 39
-            player.position.x += 1;
-  
-  create = ->
-    
-  update = ->
+	geometry = new THREE.PlaneBufferGeometry(5, 1000)
+	material = new THREE.MeshBasicMaterial({color: 0xffff00, side: THREE.DoubleSide})
+	plane = new THREE.Mesh(geometry, material)
+	scene.add(plane)
 
-  render = ->
-      renderer.render(scene, camera)
+	geometry = new THREE.PlaneBufferGeometry(0.7, 2)
+	material = new THREE.MeshBasicMaterial({color: 0xff0000, side: THREE.DoubleSide})
+	player = new THREE.Mesh(geometry, material)
+	player.position.x = 0
+	player.position.y = 2
+	player.position.z = 0.5
+	player.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2)
+	scene.add(player)
 
-  gameLoop = ->
-      requestAnimationFrame(gameLoop)
-      update()
-      render()
+	update = ->
 
-  document.addEventListener("keydown", onDocumentKeyDown, false); 
-  create()
-  gameLoop()
+	render = ->
+		renderer.render(scene, camera)
+
+	gameLoop = ->
+		requestAnimationFrame(gameLoop)
+		update()
+		render()
+
+	gameLoop()

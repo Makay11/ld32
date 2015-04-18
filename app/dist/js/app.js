@@ -8,15 +8,22 @@ defer = function(f) {
 };
 
 defer(function() {
-  var camera, create, gameLoop, geometry, height, material, onDocumentKeyDown, plane, player, render, renderer, scene, update, width;
+  var camera, gameLoop, geometry, height, material, plane, player, render, renderer, scene, update, width;
+  renderer = new THREE.WebGLRenderer();
   width = window.innerWidth;
   height = window.innerHeight;
-  renderer = new THREE.WebGLRenderer();
   renderer.setSize(width, height - 4);
-  document.body.appendChild(renderer.domElement);
+  $("body").append(renderer.domElement);
   camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
   camera.position.z = 2;
   camera.lookAt(new THREE.Vector3(0, 10, 0));
+  $(window).on("resize", function() {
+    width = window.innerWidth;
+    height = window.innerHeight;
+    renderer.setSize(width, height - 4);
+    camera.aspect = width / height;
+    return camera.updateProjectionMatrix();
+  });
   scene = new THREE.Scene();
   geometry = new THREE.PlaneBufferGeometry(5, 1000);
   material = new THREE.MeshBasicMaterial({
@@ -36,18 +43,6 @@ defer(function() {
   player.position.z = 0.5;
   player.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2);
   scene.add(player);
-  onDocumentKeyDown = function(event) {
-    var keyCode;
-    console.log(event.which);
-    keyCode = event.which;
-    switch (keyCode) {
-      case 37:
-        return player.position.x -= 1;
-      case 39:
-        return player.position.x += 1;
-    }
-  };
-  create = function() {};
   update = function() {};
   render = function() {
     return renderer.render(scene, camera);
@@ -57,7 +52,5 @@ defer(function() {
     update();
     return render();
   };
-  document.addEventListener("keydown", onDocumentKeyDown, false);
-  create();
   return gameLoop();
 });
