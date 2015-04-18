@@ -1,88 +1,5 @@
 defer = (f) -> setTimeout -> f()
 
-class Player
-	constructor: (renderer) ->
-		@width = 1
-		@height = 1.5
-
-		@position = 0
-		@moving = false
-
-		@movementSpeed = 1 / 200
-
-		@texture = THREE.ImageUtils.loadTexture("/images/runner.png")
-		@texture.minFilter = THREE.LinearFilter
-		@texture.anisotropy = renderer.getMaxAnisotropy()
-
-		@geometry = new THREE.PlaneBufferGeometry(@width, @height)
-		@material = new THREE.MeshBasicMaterial(map: @texture)
-		@mesh = new THREE.Mesh(@geometry, @material)
-
-		@mesh.position.z = @height / 2
-
-		@mesh.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2)
-		
-		@energy = 100 
-
-	
-	updateEnergy: (value) ->
-		if @energy <= 10
-			return
-		@energy += value
-	
-	moveLeft: ->
-		if @moving then return
-		if @position > -1
-			@moving = "left"
-
-	moveRight: ->
-		if @moving then return
-		if @position < 1
-			@moving = "right"
-
-	update: (delta) ->
-		if @moving
-			if @moving == "left"
-				@mesh.position.x -= @movementSpeed * delta
-				if @mesh.position.x <= @position - 2
-					@position = @position - 2
-					@mesh.position.x = @position
-					@moving = false
-			else if @moving == "right"
-				@mesh.position.x += @movementSpeed * delta
-				if @mesh.position.x >= @position + 2
-					@position = @position + 2
-					@mesh.position.x = @position
-					@moving = false
-
-class Enemy
-	constructor: (renderer) ->
-		@width = 1
-		@height = 1.5
-
-		@movementSpeed = 3 / 1000
-
-		@texture = THREE.ImageUtils.loadTexture("/images/runner.png")
-		@texture.minFilter = THREE.LinearFilter
-		@texture.anisotropy = renderer.getMaxAnisotropy()
-
-		@geometry = new THREE.PlaneBufferGeometry(@width, @height)
-		@material = new THREE.MeshBasicMaterial(map: @texture)
-		@mesh = new THREE.Mesh(@geometry, @material)
-
-		@mesh.position.x = Math.random() * 3 // 1 * 2 - 2
-		@mesh.position.y = 20
-		@mesh.position.z = @height / 2
-
-		@mesh.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2)
-
-	update: (delta) ->
-		@mesh.position.y -= @movementSpeed * delta
-
-	reset: ->
-		@mesh.position.x = Math.random() * 3 // 1 * 2 - 2
-		@mesh.position.y = 20
-
 defer ->
 	renderer = new THREE.WebGLRenderer()
 
@@ -127,12 +44,16 @@ defer ->
 		left: 37
 		right: 39
 
+	movementQueue = []
+
 	$(document).on "keydown", (event) ->
 		switch event.keyCode
 			when keyCodes.left
-				player.moveLeft()
+				if movementQueue.length < 2 and not (player.position == 0 and player.moving == "left")
+					movementQueue.push("left")
 			when keyCodes.right
-				player.moveRight()
+				if movementQueue.length < 2 and not (player.position == 0 and player.moving == "right")
+					movementQueue.push("right")
 
 	nextSpawn = 0
 
@@ -145,23 +66,40 @@ defer ->
 		$("#energy").width(player.energy + "%")
 	
 	update = (delta) ->
+		if not player.moving and movementQueue.length > 0
+			switch movementQueue[0]
+				when "left"
+					player.moveLeft()
+				when "right"
+					player.moveRight()
+			movementQueue.splice(0, 1)
+
 		player.update(delta)
 		
 		updateEnergy()
 		
 		deadEnemies = []
 
-		for enemy, index in enemies
+		for enemy in enemies
+			if not enemy.collided and enemy.mesh.position.y > 0
+				canCollide = true
+
 			enemy.update(delta)
 
-			if enemy.mesh.position.y <= camera.position.y
-				deadEnemies.push(index)
+			if canCollide and enemy.mesh.position.y < 0.25
+				enemyX = enemy.mesh.position.x
+				playerX = player.mesh.position.x
+				if enemyX - enemy.width / 2 <= playerX + player.width / 2 and playerX - player.width / 2 <= enemyX + enemy.width / 2
+					enemy.collided = true
+					console.log "ded"
 
-		for index in deadEnemies
-			enemy = enemies[index]
-			enemies.splice(index, 1)
-			enemyPool.push(enemy)
-			scene.remove(enemy.mesh)
+			if enemy.mesh.position.y <= camera.position.y
+				enemyPool.push(enemy)
+				scene.remove(enemy.mesh)
+				deadEnemies.push(enemy)
+
+		for enemy in deadEnemies
+			enemies.splice(enemies.indexOf(enemy), 1)
 
 		nextSpawn -= delta or 0
 		if nextSpawn <= 0
