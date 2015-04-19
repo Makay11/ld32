@@ -29,12 +29,9 @@ class GameManager
 
 	createScene: ->
 		@scene = new THREE.Scene()
+		@scene.fog = new THREE.Fog(0x000000, 10, 30)
 
-		geometry = new THREE.PlaneBufferGeometry(6, 20)
-		material = new THREE.MeshBasicMaterial(map: THREE.ImageUtils.loadTexture("/images/road.png"))
-		plane = new THREE.Mesh(geometry, material)
-		plane.position.y = @camera.position.y + 10
-		@scene.add(plane)
+		@road = new Road(@scene, @renderer)
 
 		@player = new Player(@renderer)
 		@scene.add(@player.mesh)
@@ -96,6 +93,8 @@ class GameManager
 
 	update: (delta) ->
 		if @paused then return
+
+		@road.update(delta)
 
 		if not @player.moving and @movementQueue.length > 0
 			switch @movementQueue[0]
