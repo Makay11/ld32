@@ -2,41 +2,61 @@
 
 class Player extends Entity
 	constructor: (renderer) ->
-		super(renderer, "/images/runner.png")
+		super(renderer, "/images/running_sprite.png", 8)
 
 		@position = 0
 		@moving = false
 
 		@energy = 100
 
-		@movementSpeed = 1 / 200
+		@runningSprite = @texture
+		@runningSpriteTiles = 8
+		@runningAnimationDuration = 500 / @runningSpriteTiles
+
+		@jumpSpriteTiles = 6
+		@jumpAnimationDuration = 300 / @jumpSpriteTiles
+
+		@jumpLeftSprite = @loadTexture("/images/jump_left_sprite.png")
+		@jumpLeftSprite.repeat.x = 1 / @jumpSpriteTiles
+
+		@jumpRightSprite = @jumpLeftSprite
+
+		@jumpSpeed = 2 / (@jumpAnimationDuration * @jumpSpriteTiles)
 
 	moveLeft: ->
 		if @moving then return
 		if @position > -1
+			@setTexture(@jumpLeftSprite, @jumpSpriteTiles, @jumpAnimationDuration)
 			@moving = "left"
 
 	moveRight: ->
 		if @moving then return
 		if @position < 1
+			@setTexture(@jumpRightSprite, @jumpSpriteTiles, @jumpAnimationDuration)
 			@moving = "right"
 
 	update: (delta) ->
+		super(delta)
+
 		if @moving
 			if @moving == "left"
-				@mesh.position.x -= @movementSpeed * delta
+				@mesh.position.x -= @jumpSpeed * delta
 				if @mesh.position.x <= @position - 2
 					@position = @position - 2
 					@mesh.position.x = @position
-					@moving = false
+					@setRunning()
 			else if @moving == "right"
-				@mesh.position.x += @movementSpeed * delta
+				@mesh.position.x += @jumpSpeed * delta
 				if @mesh.position.x >= @position + 2
 					@position = @position + 2
 					@mesh.position.x = @position
-					@moving = false
+					@setRunning()
 
 		@updateEnergy(-1)
+
+	setRunning: ->
+		@setTexture(@runningSprite, @runningSpriteTiles, @runningAnimationDuration)
+		@moving = false
 
 	updateEnergy: (value) ->
 		@energy += value
