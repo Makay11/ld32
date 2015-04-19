@@ -19,7 +19,8 @@ class Player extends Entity
 		@jumpLeftSprite = @loadTexture("/images/jump_left_sprite.png")
 		@jumpLeftSprite.repeat.x = 1 / @jumpSpriteTiles
 
-		@jumpRightSprite = @jumpLeftSprite
+		@jumpRightSprite = @loadTexture("/images/jump_right_sprite.png")
+		@jumpRightSprite.repeat.x = 1 / @jumpSpriteTiles
 
 		@jumpSpeed = 2 / (@jumpAnimationDuration * @jumpSpriteTiles)
 

@@ -105,7 +105,8 @@ Player = (function(superClass) {
     this.jumpAnimationDuration = 300 / this.jumpSpriteTiles;
     this.jumpLeftSprite = this.loadTexture("/images/jump_left_sprite.png");
     this.jumpLeftSprite.repeat.x = 1 / this.jumpSpriteTiles;
-    this.jumpRightSprite = this.jumpLeftSprite;
+    this.jumpRightSprite = this.loadTexture("/images/jump_right_sprite.png");
+    this.jumpRightSprite.repeat.x = 1 / this.jumpSpriteTiles;
     this.jumpSpeed = 2 / (this.jumpAnimationDuration * this.jumpSpriteTiles);
   }
 
