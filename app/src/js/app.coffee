@@ -1,8 +1,13 @@
 defer = (f) -> setTimeout -> f()
 
 keyCodes =
+	space: 32
 	left: 37
 	right: 39
+	1: 49
+	2: 50
+	3: 51
+	4: 52
 
 defer ->
 	gameManager = new GameManager()

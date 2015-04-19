@@ -53,7 +53,7 @@ class Player extends Entity
 					@mesh.position.x = @position
 					@setRunning()
 
-		@updateEnergy(-1)
+		@updateEnergy(-10 / 1000 * delta)
 
 	setRunning: ->
 		@setTexture(@runningSprite, @runningSpriteTiles, @runningAnimationDuration)

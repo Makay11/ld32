@@ -11,6 +11,8 @@ class GameManager
 		@camera.position.z = 2
 		@camera.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2.2)
 
+		@paused = true
+
 		@enemies = []
 
 		@enemyPool = []
@@ -21,14 +23,17 @@ class GameManager
 
 		@nextSpawn = 0
 
+		@soundSequence = []
+
 		@createScene()
 
 	createScene: ->
 		@scene = new THREE.Scene()
 
-		geometry = new THREE.PlaneBufferGeometry(6, 1000)
-		material = new THREE.MeshBasicMaterial({color: 0xffff00, side: THREE.DoubleSide})
+		geometry = new THREE.PlaneBufferGeometry(6, 20)
+		material = new THREE.MeshBasicMaterial(map: THREE.ImageUtils.loadTexture("/images/road.png"))
 		plane = new THREE.Mesh(geometry, material)
+		plane.position.y = @camera.position.y + 10
 		@scene.add(plane)
 
 		@player = new Player(@renderer)
@@ -50,22 +55,48 @@ class GameManager
 		@camera.updateProjectionMatrix()
 
 	keyDown: (event) ->
-		switch event.keyCode
-			when keyCodes.left
-				if @movementQueue.length < 2 and not (@player.position == 0 and @player.moving == "left")
-					@movementQueue.push("left")
-			when keyCodes.right
-				if @movementQueue.length < 2 and not (@player.position == 0 and @player.moving == "right")
-					@movementQueue.push("right")
+		key = event.keyCode
+		#console.log key
+		if key == keyCodes.space
+			@paused = not @paused
+		else if not @paused
+			switch key
+				when keyCodes.left
+					if @movementQueue.length < 2 and not (@player.position == 0 and @player.moving == "left")
+						@movementQueue.push("left")
+				when keyCodes.right
+					if @movementQueue.length < 2 and not (@player.position == 0 and @player.moving == "right")
+						@movementQueue.push("right")
 
-	generateNextSpawn: ->
-		@nextSpawn = Math.random() * 2 * 1000 // 1
+			if 49 <= key <= 52
+				@playSound(key)
+
+	playSound: (key) ->
+		@soundSequence.push(key)
+
+		if not @player.moving
+			for enemy, index in @enemies
+				if enemy.mesh.position.x == @player.mesh.position.x
+					if energy = enemy.attack(@soundSequence)
+						@enemies.splice(index, 1)
+						@enemyPool.push(enemy)
+						@scene.remove(enemy.mesh)
+						enemy.reset()
+
+						@player.updateEnergy(energy)
+						$(".score .text").text(parseInt($(".score .text").text()) + energy)
+						$(".monstersKilled .text").text(parseInt($(".monstersKilled .text").text()) + 1)
+					break
 
 	render: ->
+		if @paused then return
+
 		THREEx.Transparency.update(@transparentObjects, @camera)
 		@renderer.render(@scene, @camera)
 
 	update: (delta) ->
+		if @paused then return
+
 		if not @player.moving and @movementQueue.length > 0
 			switch @movementQueue[0]
 				when "left"
@@ -76,9 +107,7 @@ class GameManager
 
 		@player.update(delta)
 
-		deadEnemies = []
-
-		for enemy in @enemies
+		for enemy, index in @enemies
 			if not enemy.collided and enemy.mesh.position.y > 0
 				canCollide = true
 
@@ -92,12 +121,11 @@ class GameManager
 					console.log "ded"
 
 			if enemy.mesh.position.y <= @camera.position.y
+				@enemies[index] = null
 				@enemyPool.push(enemy)
 				@scene.remove(enemy.mesh)
-				deadEnemies.push(enemy)
 
-		for enemy in deadEnemies
-			@enemies.splice(@enemies.indexOf(enemy), 1)
+		@enemies = @enemies.filter (o) -> !!o
 
 		@nextSpawn -= delta or 0
 		if @nextSpawn <= 0
@@ -105,8 +133,14 @@ class GameManager
 				enemy = @enemyPool.pop()
 				enemy.reset()
 			else
-				enemy = new Enemy_C69(@renderer)
+				if Math.random() < 0.7
+					enemy = new Enemy_Minibot(@renderer)
+				else
+					enemy = new Enemy_C69(@renderer)
 				@addTransparentObject(enemy)
 			@enemies.push(enemy)
 			@scene.add(enemy.mesh)
 			@generateNextSpawn()
+
+	generateNextSpawn: ->
+		@nextSpawn = Math.random() * 2 * 1000 // 1

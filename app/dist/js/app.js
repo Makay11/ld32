@@ -10,8 +10,13 @@ defer = function(f) {
 };
 
 keyCodes = {
+  space: 32,
   left: 37,
-  right: 39
+  right: 39,
+  1: 49,
+  2: 50,
+  3: 51,
+  4: 52
 };
 
 defer(function() {
@@ -149,7 +154,7 @@ Player = (function(superClass) {
         }
       }
     }
-    return this.updateEnergy(-1);
+    return this.updateEnergy(-10 / 1000 * delta);
   };
 
   Player.prototype.setRunning = function() {
@@ -181,23 +186,25 @@ GameManager = (function() {
     this.camera.position.y = -2.5;
     this.camera.position.z = 2;
     this.camera.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2.2);
+    this.paused = true;
     this.enemies = [];
     this.enemyPool = [];
     this.transparentObjects = [];
     this.movementQueue = [];
     this.nextSpawn = 0;
+    this.soundSequence = [];
     this.createScene();
   }
 
   GameManager.prototype.createScene = function() {
     var geometry, material, plane;
     this.scene = new THREE.Scene();
-    geometry = new THREE.PlaneBufferGeometry(6, 1000);
+    geometry = new THREE.PlaneBufferGeometry(6, 20);
     material = new THREE.MeshBasicMaterial({
-      color: 0xffff00,
-      side: THREE.DoubleSide
+      map: THREE.ImageUtils.loadTexture("/images/road.png")
     });
     plane = new THREE.Mesh(geometry, material);
+    plane.position.y = this.camera.position.y + 10;
     this.scene.add(plane);
     this.player = new Player(this.renderer);
     this.scene.add(this.player.mesh);
@@ -218,30 +225,68 @@ GameManager = (function() {
   };
 
   GameManager.prototype.keyDown = function(event) {
-    switch (event.keyCode) {
-      case keyCodes.left:
-        if (this.movementQueue.length < 2 && !(this.player.position === 0 && this.player.moving === "left")) {
-          return this.movementQueue.push("left");
-        }
-        break;
-      case keyCodes.right:
-        if (this.movementQueue.length < 2 && !(this.player.position === 0 && this.player.moving === "right")) {
-          return this.movementQueue.push("right");
-        }
+    var key;
+    key = event.keyCode;
+    if (key === keyCodes.space) {
+      return this.paused = !this.paused;
+    } else if (!this.paused) {
+      switch (key) {
+        case keyCodes.left:
+          if (this.movementQueue.length < 2 && !(this.player.position === 0 && this.player.moving === "left")) {
+            this.movementQueue.push("left");
+          }
+          break;
+        case keyCodes.right:
+          if (this.movementQueue.length < 2 && !(this.player.position === 0 && this.player.moving === "right")) {
+            this.movementQueue.push("right");
+          }
+      }
+      if ((49 <= key && key <= 52)) {
+        return this.playSound(key);
+      }
     }
   };
 
-  GameManager.prototype.generateNextSpawn = function() {
-    return this.nextSpawn = Math.floor(Math.random() * 2 * 1000 / 1);
+  GameManager.prototype.playSound = function(key) {
+    var enemy, energy, i, index, len, ref, results;
+    this.soundSequence.push(key);
+    if (!this.player.moving) {
+      ref = this.enemies;
+      results = [];
+      for (index = i = 0, len = ref.length; i < len; index = ++i) {
+        enemy = ref[index];
+        if (enemy.mesh.position.x === this.player.mesh.position.x) {
+          if (energy = enemy.attack(this.soundSequence)) {
+            this.enemies.splice(index, 1);
+            this.enemyPool.push(enemy);
+            this.scene.remove(enemy.mesh);
+            enemy.reset();
+            this.player.updateEnergy(energy);
+            $(".score .text").text(parseInt($(".score .text").text()) + energy);
+            $(".monstersKilled .text").text(parseInt($(".monstersKilled .text").text()) + 1);
+          }
+          break;
+        } else {
+          results.push(void 0);
+        }
+      }
+      return results;
+    }
   };
 
   GameManager.prototype.render = function() {
+    if (this.paused) {
+      return;
+    }
     THREEx.Transparency.update(this.transparentObjects, this.camera);
     return this.renderer.render(this.scene, this.camera);
   };
 
   GameManager.prototype.update = function(delta) {
-    var canCollide, deadEnemies, enemy, enemyX, i, j, len, len1, playerX, ref;
+    var canCollide, enemy, enemyX, i, index, len, playerX, ref;
+    if (this.paused) {
+      return;
+    }
     if (!this.player.moving && this.movementQueue.length > 0) {
       switch (this.movementQueue[0]) {
         case "left":
@@ -253,10 +298,9 @@ GameManager = (function() {
       this.movementQueue.splice(0, 1);
     }
     this.player.update(delta);
-    deadEnemies = [];
     ref = this.enemies;
-    for (i = 0, len = ref.length; i < len; i++) {
-      enemy = ref[i];
+    for (index = i = 0, len = ref.length; i < len; index = ++i) {
+      enemy = ref[index];
       if (!enemy.collided && enemy.mesh.position.y > 0) {
         canCollide = true;
       }
@@ -270,28 +314,35 @@ GameManager = (function() {
         }
       }
       if (enemy.mesh.position.y <= this.camera.position.y) {
+        this.enemies[index] = null;
         this.enemyPool.push(enemy);
         this.scene.remove(enemy.mesh);
-        deadEnemies.push(enemy);
       }
     }
-    for (j = 0, len1 = deadEnemies.length; j < len1; j++) {
-      enemy = deadEnemies[j];
-      this.enemies.splice(this.enemies.indexOf(enemy), 1);
-    }
+    this.enemies = this.enemies.filter(function(o) {
+      return !!o;
+    });
     this.nextSpawn -= delta || 0;
     if (this.nextSpawn <= 0) {
       if (this.enemyPool.length > 0) {
         enemy = this.enemyPool.pop();
         enemy.reset();
       } else {
-        enemy = new Enemy_C69(this.renderer);
+        if (Math.random() < 0.7) {
+          enemy = new Enemy_Minibot(this.renderer);
+        } else {
+          enemy = new Enemy_C69(this.renderer);
+        }
         this.addTransparentObject(enemy);
       }
       this.enemies.push(enemy);
       this.scene.add(enemy.mesh);
       return this.generateNextSpawn();
     }
+  };
+
+  GameManager.prototype.generateNextSpawn = function() {
+    return this.nextSpawn = Math.floor(Math.random() * 2 * 1000 / 1);
   };
 
   return GameManager;
@@ -319,6 +370,10 @@ Enemy = (function(superClass) {
     return this.collided = false;
   };
 
+  Enemy.prototype.attack = function(soundSequence) {
+    return 0;
+  };
+
   return Enemy;
 
 })(Entity);
@@ -330,6 +385,17 @@ Enemy_C69 = (function(superClass) {
     Enemy_C69.__super__.constructor.call(this, renderer, "/images/c69.png");
   }
 
+  Enemy_C69.prototype.attack = function(soundSequence) {
+    var length;
+    if ((length = soundSequence.length) >= 3) {
+      if (soundSequence[length - 3] === keyCodes[1] && soundSequence[length - 2] === keyCodes[2] && soundSequence[length - 1] === keyCodes[1]) {
+        soundSequence.splice(0, length);
+        return 20;
+      }
+    }
+    return 0;
+  };
+
   return Enemy_C69;
 
 })(Enemy);
@@ -340,6 +406,17 @@ Enemy_Minibot = (function(superClass) {
   function Enemy_Minibot(renderer) {
     Enemy_Minibot.__super__.constructor.call(this, renderer, "/images/minibot.png");
   }
+
+  Enemy_Minibot.prototype.attack = function(soundSequence) {
+    var length;
+    if ((length = soundSequence.length) >= 2) {
+      if (soundSequence[length - 2] === keyCodes[1] && soundSequence[length - 1] === keyCodes[3]) {
+        soundSequence.splice(0, length);
+        return 10;
+      }
+    }
+    return 0;
+  };
 
   return Enemy_Minibot;
 
