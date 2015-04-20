@@ -33,6 +33,11 @@ class GameManager
 
 		@scene.add(@createSky())
 
+		for floor in @createBuildingFloors()
+			@scene.add(floor)
+
+		@scene.add(@createMoon())
+
 	createSky: ->
 		geometry = new THREE.PlaneBufferGeometry(100, 100)
 		texture = THREE.ImageUtils.loadTexture("/images/stars.png")
@@ -46,6 +51,30 @@ class GameManager
 		mesh.position.z = 7
 		mesh.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI)
 		mesh
+
+	createBuildingFloors: ->
+		geometry = new THREE.PlaneBufferGeometry(60, 100)
+		material = new THREE.MeshBasicMaterial(color: 0x454545)
+		floors = [new THREE.Mesh(geometry, material), new THREE.Mesh(geometry, material)]
+		offsets = [-1, 1]
+		for floor, index in floors
+			floor.position.x = offsets[index] * (3 + 1.5 + 30)
+		floors
+
+	createMoon: ->
+		geometry = new THREE.PlaneBufferGeometry(1.1, 1.1)
+		texture = THREE.ImageUtils.loadTexture("/images/moon.png")
+		texture.minFilter = THREE.LinearFilter
+		texture.anisotropy = @renderer.getMaxAnisotropy()
+		material = new THREE.MeshBasicMaterial(map: texture)
+		@moon = new THREE.Mesh(geometry, material)
+		@moon.position.set(-2.5, 9, 6)
+		@moon.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2)
+		THREEx.Transparency.init([@moon])
+		@moon
+
+	renderMoon: (camera) ->
+		THREEx.Transparency.update([@moon], camera)
 
 	resize: (width, height) ->
 		@width = width or window.innerWidth
@@ -103,5 +132,7 @@ class GameManager
 
 		@enemyManager.render(@camera)
 		@player.render(@camera)
+
+		@renderMoon(@camera)
 
 		@renderer.render(@scene, @camera)

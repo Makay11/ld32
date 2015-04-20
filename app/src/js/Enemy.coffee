@@ -44,7 +44,7 @@ class Enemy extends Entity
 
 	reset: ->
 		@mesh.position.x = Math.random() * 3 // 1 * 2 - 2
-		@mesh.position.y = 20
+		@mesh.position.y = 25
 		@collided = false
 
 	attack: (soundSequence) -> 0

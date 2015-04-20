@@ -26,11 +26,11 @@ $(function() {
   previousTime = 0;
   gameLoop = function(time) {
     var delta;
-    requestAnimationFrame(gameLoop);
     delta = time - previousTime;
     previousTime = time;
     gameManager.update(delta);
-    return gameManager.render();
+    gameManager.render();
+    return requestAnimationFrame(gameLoop);
   };
   return gameLoop();
 });
@@ -269,6 +269,7 @@ GameManager = (function() {
   }
 
   GameManager.prototype.createScene = function() {
+    var floor, j, len, ref;
     this.scene = new THREE.Scene();
     this.scene.fog = new THREE.Fog(0x000000, 10, 30);
     this.road = new Road(this.scene, this.renderer);
@@ -276,7 +277,13 @@ GameManager = (function() {
     this.scene.add(this.player.mesh);
     this.enemyManager = new EnemyManager(this.renderer, this.scene);
     this.buildings = new Buildings(this.renderer, this.scene);
-    return this.scene.add(this.createSky());
+    this.scene.add(this.createSky());
+    ref = this.createBuildingFloors();
+    for (j = 0, len = ref.length; j < len; j++) {
+      floor = ref[j];
+      this.scene.add(floor);
+    }
+    return this.scene.add(this.createMoon());
   };
 
   GameManager.prototype.createSky = function() {
@@ -295,6 +302,41 @@ GameManager = (function() {
     mesh.position.z = 7;
     mesh.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI);
     return mesh;
+  };
+
+  GameManager.prototype.createBuildingFloors = function() {
+    var floor, floors, geometry, index, j, len, material, offsets;
+    geometry = new THREE.PlaneBufferGeometry(60, 100);
+    material = new THREE.MeshBasicMaterial({
+      color: 0x454545
+    });
+    floors = [new THREE.Mesh(geometry, material), new THREE.Mesh(geometry, material)];
+    offsets = [-1, 1];
+    for (index = j = 0, len = floors.length; j < len; index = ++j) {
+      floor = floors[index];
+      floor.position.x = offsets[index] * (3 + 1.5 + 30);
+    }
+    return floors;
+  };
+
+  GameManager.prototype.createMoon = function() {
+    var geometry, material, texture;
+    geometry = new THREE.PlaneBufferGeometry(1.1, 1.1);
+    texture = THREE.ImageUtils.loadTexture("/images/moon.png");
+    texture.minFilter = THREE.LinearFilter;
+    texture.anisotropy = this.renderer.getMaxAnisotropy();
+    material = new THREE.MeshBasicMaterial({
+      map: texture
+    });
+    this.moon = new THREE.Mesh(geometry, material);
+    this.moon.position.set(-2.5, 9, 6);
+    this.moon.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2);
+    THREEx.Transparency.init([this.moon]);
+    return this.moon;
+  };
+
+  GameManager.prototype.renderMoon = function(camera) {
+    return THREEx.Transparency.update([this.moon], camera);
   };
 
   GameManager.prototype.resize = function(width, height) {
@@ -361,6 +403,7 @@ GameManager = (function() {
     }
     this.enemyManager.render(this.camera);
     this.player.render(this.camera);
+    this.renderMoon(this.camera);
     return this.renderer.render(this.scene, this.camera);
   };
 
@@ -613,7 +656,7 @@ Enemy = (function(superClass) {
 
   Enemy.prototype.reset = function() {
     this.mesh.position.x = Math.floor(Math.random() * 3 / 1) * 2 - 2;
-    this.mesh.position.y = 20;
+    this.mesh.position.y = 25;
     return this.collided = false;
   };
 

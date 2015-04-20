@@ -21,12 +21,12 @@ $ ->
 	previousTime = 0
 
 	gameLoop = (time) ->
-		requestAnimationFrame(gameLoop)
-
 		delta = time - previousTime
 		previousTime = time
 
 		gameManager.update(delta)
 		gameManager.render()
+
+		requestAnimationFrame(gameLoop)
 
 	gameLoop()
