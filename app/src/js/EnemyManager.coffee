@@ -1,5 +1,31 @@
 class EnemyManager
 	constructor: (@renderer, @scene) ->
+		@nextSpawn = 0
+
+		@probabilities =
+			c69:
+				any: 0.3						# 0.3
+				colors:
+					grey: 0.5					# 0.5
+					red: 0.8					# 0.3
+					purple: 0.95			# 0.15
+					golden: 1					# 0.05
+			minibot:
+				any: 0.8  					# 0.5
+				colors:
+					green: 0.1    		# 0.1
+					grey: 0.5     		# 0.4
+					blue: 0.6     		# 0.1
+					red: 0.8      		# 0.2
+					purple: 0.95  		# 0.15
+					golden: 1     		# 0.5
+			barrier:
+				any: 1          		# 0.2
+				kinds:
+					sand: 0.33				# 0.33
+					barrier: 0.66			# 0.33
+					sand_barrier: 1		# 0.34
+
 		@liveEnemies = []
 
 		@enemyPool =
@@ -15,26 +41,10 @@ class EnemyManager
 				golden: []
 				red: []
 				purple: []
-
-		@probabilities =
-			c69:
-				any: 0.4				# 0.4
-				colors:
-					grey: 0.5			# 0.5
-					red: 0.8			# 0.3
-					purple: 0.95	# 0.15
-					golden: 1			# 0.05
-			minibot:
-				any: 1					# 0.6
-				colors:
-					green: 0.1    # 0.1
-					grey: 0.5     # 0.4
-					blue: 0.6     # 0.1
-					red: 0.8      # 0.2
-					purple: 0.95  # 0.15
-					golden: 1     # 0.5
-
-		@nextSpawn = 0
+			barrier:
+				sand: []
+				barrier: []
+				sand_barrier: []
 
 	render: (camera) ->
 		for enemy in @liveEnemies
@@ -103,18 +113,28 @@ class EnemyManager
 				enemy = @enemyPool.minibot.purple.pop() or new Minibot(@renderer, "purple")
 			else if r <= colors.golden
 				enemy = @enemyPool.minibot.golden.pop() or new Minibot(@renderer, "golden")
+		else if r <= @probabilities.barrier.any
+			r = Math.random()
+			kinds = @probabilities.barrier.kinds
+
+			if r <= kinds.sand
+				enemy = @enemyPool.barrier.sand.pop() or new Barrier(@renderer, "sand")
+			else if r <= kinds.barrier
+				enemy = @enemyPool.barrier.barrier.pop() or new Barrier(@renderer, "barrier")
+			else if r <= kinds.sand_barrier
+				enemy = @enemyPool.barrier.sand_barrier.pop() or new Barrier(@renderer, "sand_barrier")
 
 		@liveEnemies.push(enemy)
 		@scene.add(enemy.mesh)
 
 	stashEnemy: (enemy) ->
 		@scene.remove(enemy.mesh)
-		@enemyPool[enemy.type][enemy.color].push(enemy)
+		@enemyPool[enemy.type][enemy.color or enemy.kind].push(enemy)
 		enemy.reset()
 
 	attack: (player, soundSequence) ->
 		for enemy, index in @liveEnemies
-			if enemy.mesh.position.x == player.mesh.position.x
+			if enemy.mesh.position.y > 0 and enemy.mesh.position.x == player.mesh.position.x
 				if energy = enemy.attack(soundSequence)
 					@liveEnemies.splice(index, 1)
 					@stashEnemy(enemy)

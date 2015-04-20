@@ -5,23 +5,27 @@ components = null
 do ->
 	geometry = new THREE.PlaneBufferGeometry(1, 1.5)
 
-	generateComponents = (textureURL) ->
-		material: new THREE.MeshBasicMaterial(map: Entity::loadTexture(textureURL))
+	generateComponents = (textureName) ->
+		material: new THREE.MeshBasicMaterial(map: Entity::loadTexture("/images/#{textureName}.png"))
 		geometry: geometry
 
 	components =
 		c69:
-			grey: generateComponents("/images/c69_grey.png")
-			golden: generateComponents("/images/c69_golden.png")
-			red: generateComponents("/images/c69_red.png")
-			purple: generateComponents("/images/c69_purple.png")
+			grey: generateComponents("c69_grey")
+			golden: generateComponents("c69_golden")
+			red: generateComponents("c69_red")
+			purple: generateComponents("c69_purple")
 		minibot:
-			green: generateComponents("/images/minibot_green.png")
-			grey: generateComponents("/images/minibot_grey.png")
-			blue: generateComponents("/images/minibot_blue.png")
-			golden: generateComponents("/images/minibot_golden.png")
-			red: generateComponents("/images/minibot_red.png")
-			purple: generateComponents("/images/minibot_purple.png")
+			green: generateComponents("minibot_green")
+			grey: generateComponents("minibot_grey")
+			blue: generateComponents("minibot_blue")
+			golden: generateComponents("minibot_golden")
+			red: generateComponents("minibot_red")
+			purple: generateComponents("minibot_purple")
+		barrier:
+			sand: generateComponents("sand")
+			barrier: generateComponents("barrier")
+			sand_barrier: generateComponents("sand_barrier")
 
 class Enemy extends Entity
 	constructor: (renderer, components) ->
@@ -70,3 +74,8 @@ class Minibot extends Enemy
 				soundSequence.splice(0, length)
 				return 10
 		return 0
+
+class Barrier extends Enemy
+	constructor: (renderer, @kind) ->
+		super(renderer, components.barrier[@kind])
+		@type = "barrier"
