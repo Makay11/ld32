@@ -29,6 +29,7 @@ class GameManager
 		@scene.add(@player.mesh)
 
 		@enemyManager = new EnemyManager(@renderer, @scene)
+		@buildings = new Buildings(@renderer, @scene)
 
 	resize: (width, height) ->
 		@width = width or window.innerWidth
@@ -78,6 +79,8 @@ class GameManager
 		@player.update(delta)
 
 		@enemyManager.update(delta, @player, @camera)
+
+		@buildings.update(delta)
 
 	render: ->
 		if @paused then return
