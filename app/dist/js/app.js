@@ -147,12 +147,12 @@ Player = (function(superClass) {
 
   function Player(renderer) {
     Player.__super__.constructor.call(this, renderer, "/images/running_sprite.png", 8);
-    this.position = 0;
-    this.moving = false;
     this.energy = 100;
+    this.position = 0;
     this.runningSprite = this.texture;
     this.runningSpriteTiles = 8;
-    this.runningAnimationDuration = 500 / this.runningSpriteTiles;
+    this.runningAnimationDuration = 300 / this.runningSpriteTiles;
+    this.setRunning();
     this.jumpSpriteTiles = 6;
     this.jumpAnimationDuration = 300 / this.jumpSpriteTiles;
     this.jumpLeftSprite = this.loadTexture("/images/jump_left_sprite.png");

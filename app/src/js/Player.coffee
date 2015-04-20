@@ -4,14 +4,15 @@ class Player extends Entity
 	constructor: (renderer) ->
 		super(renderer, "/images/running_sprite.png", 8)
 
-		@position = 0
-		@moving = false
-
 		@energy = 100
+
+		@position = 0
 
 		@runningSprite = @texture
 		@runningSpriteTiles = 8
-		@runningAnimationDuration = 500 / @runningSpriteTiles
+		@runningAnimationDuration = 300 / @runningSpriteTiles
+
+		@setRunning()
 
 		@jumpSpriteTiles = 6
 		@jumpAnimationDuration = 300 / @jumpSpriteTiles
