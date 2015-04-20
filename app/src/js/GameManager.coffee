@@ -90,6 +90,26 @@ class GameManager
 		#console.log key
 		if key == keyCodes.space
 			@paused = not @paused
+
+			if @paused
+				@music.stop()
+			else if @music
+				@music.play()
+			else if AudioFX.supported.mp3
+				options =
+					loop: true
+					autoplay: true
+					volume: 1
+
+				if not AudioFX.supported.loop
+					delete options.loop
+					if @musicTimeout
+						clearTimeout(@musicTimeout)
+					callback = ->
+						@music.play()
+						@musicTimeout = setTimeout(callback, 5 * 60 * 1000 + 43 * 1000)
+
+				@music = AudioFX("/audio/Cottonmouth_Timeshift.mp3", options, callback)
 		else if not @paused
 			switch key
 				when keyCodes.left

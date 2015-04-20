@@ -348,10 +348,32 @@ GameManager = (function() {
   };
 
   GameManager.prototype.keyDown = function(event) {
-    var key;
+    var callback, key, options;
     key = event.keyCode;
     if (key === keyCodes.space) {
-      return this.paused = !this.paused;
+      this.paused = !this.paused;
+      if (this.paused) {
+        return this.music.stop();
+      } else if (this.music) {
+        return this.music.play();
+      } else if (AudioFX.supported.mp3) {
+        options = {
+          loop: true,
+          autoplay: true,
+          volume: 1
+        };
+        if (!AudioFX.supported.loop) {
+          delete options.loop;
+          if (this.musicTimeout) {
+            clearTimeout(this.musicTimeout);
+          }
+          callback = function() {
+            this.music.play();
+            return this.musicTimeout = setTimeout(callback, 5 * 60 * 1000 + 43 * 1000);
+          };
+        }
+        return this.music = AudioFX("/audio/Cottonmouth_Timeshift.mp3", options, callback);
+      }
     } else if (!this.paused) {
       switch (key) {
         case keyCodes.left:
