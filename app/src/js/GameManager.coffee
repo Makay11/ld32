@@ -31,6 +31,22 @@ class GameManager
 		@enemyManager = new EnemyManager(@renderer, @scene)
 		@buildings = new Buildings(@renderer, @scene)
 
+		@scene.add(@createSky())
+
+	createSky: ->
+		geometry = new THREE.PlaneBufferGeometry(100, 100)
+		texture = THREE.ImageUtils.loadTexture("/images/stars.png")
+		texture.minFilter = THREE.LinearFilter
+		texture.anisotropy = @renderer.getMaxAnisotropy()
+		texture.wrapS = THREE.RepeatWrapping
+		texture.wrapT = THREE.RepeatWrapping;
+		texture.repeat.set(4, 4)
+		material = new THREE.MeshBasicMaterial(map: texture)
+		mesh = new THREE.Mesh(geometry, material)
+		mesh.position.z = 7
+		mesh.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI)
+		mesh
+
 	resize: (width, height) ->
 		@width = width or window.innerWidth
 		@height = height or window.innerHeight

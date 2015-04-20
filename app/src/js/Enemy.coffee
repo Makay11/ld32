@@ -37,7 +37,7 @@ class Enemy extends Entity
 		@collided = false
 
 		@mesh.position.x = Math.random() * 3 // 1 * 2 - 2
-		@mesh.position.y = 20
+		@mesh.position.y = 25
 
 	update: (delta) ->
 		@mesh.position.y -= @movementSpeed * delta

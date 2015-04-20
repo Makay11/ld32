@@ -275,7 +275,26 @@ GameManager = (function() {
     this.player = new Player(this.renderer);
     this.scene.add(this.player.mesh);
     this.enemyManager = new EnemyManager(this.renderer, this.scene);
-    return this.buildings = new Buildings(this.renderer, this.scene);
+    this.buildings = new Buildings(this.renderer, this.scene);
+    return this.scene.add(this.createSky());
+  };
+
+  GameManager.prototype.createSky = function() {
+    var geometry, material, mesh, texture;
+    geometry = new THREE.PlaneBufferGeometry(100, 100);
+    texture = THREE.ImageUtils.loadTexture("/images/stars.png");
+    texture.minFilter = THREE.LinearFilter;
+    texture.anisotropy = this.renderer.getMaxAnisotropy();
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
+    texture.repeat.set(4, 4);
+    material = new THREE.MeshBasicMaterial({
+      map: texture
+    });
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.z = 7;
+    mesh.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI);
+    return mesh;
   };
 
   GameManager.prototype.resize = function(width, height) {
@@ -585,7 +604,7 @@ Enemy = (function(superClass) {
     this.movementSpeed = 3 / 1000;
     this.collided = false;
     this.mesh.position.x = Math.floor(Math.random() * 3 / 1) * 2 - 2;
-    this.mesh.position.y = 20;
+    this.mesh.position.y = 25;
   }
 
   Enemy.prototype.update = function(delta) {
