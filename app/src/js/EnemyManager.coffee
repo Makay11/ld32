@@ -1,5 +1,3 @@
-#= require Enemy
-
 class EnemyManager
 	constructor: (@renderer, @scene) ->
 		@liveEnemies = []

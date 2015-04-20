@@ -1,5 +1,3 @@
-defer = (f) -> setTimeout -> f()
-
 keyCodes =
 	space: 32
 	left: 37
@@ -9,7 +7,7 @@ keyCodes =
 	3: 51
 	4: 52
 
-defer ->
+$ ->
 	gameManager = new GameManager()
 
 	$("body").append(gameManager.renderer.domElement)

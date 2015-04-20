@@ -3,6 +3,12 @@ class GameManager
 		@width = width or window.innerWidth
 		@height = height or window.innerHeight
 
+		@paused = true
+
+		@movementQueue = []
+
+		@soundSequence = []
+
 		@renderer = new THREE.WebGLRenderer()
 		@renderer.setSize(@width, @height - 4)
 
@@ -10,12 +16,6 @@ class GameManager
 		@camera.position.y = -2.5
 		@camera.position.z = 2
 		@camera.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2.2)
-
-		@paused = true
-
-		@movementQueue = []
-
-		@soundSequence = []
 
 		@createScene()
 
@@ -62,14 +62,6 @@ class GameManager
 		if not @player.moving
 			@enemyManager.attack(@player, @soundSequence)
 
-	render: ->
-		if @paused then return
-
-		@enemyManager.render(@camera)
-		@player.render(@camera)
-
-		@renderer.render(@scene, @camera)
-
 	update: (delta) ->
 		if @paused then return
 
@@ -86,3 +78,11 @@ class GameManager
 		@player.update(delta)
 
 		@enemyManager.update(delta, @player, @camera)
+
+	render: ->
+		if @paused then return
+
+		@enemyManager.render(@camera)
+		@player.render(@camera)
+
+		@renderer.render(@scene, @camera)

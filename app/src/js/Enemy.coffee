@@ -1,8 +1,32 @@
 #= require Entity
 
+components = null
+
+do ->
+	geometry = new THREE.PlaneBufferGeometry(1, 1.5)
+
+	generateComponents = (textureURL) ->
+		material: new THREE.MeshBasicMaterial(map: Entity::loadTexture(textureURL))
+		geometry: geometry
+
+	components =
+		c69:
+			grey: generateComponents("/images/c69_grey.png")
+			golden: generateComponents("/images/c69_golden.png")
+			red: generateComponents("/images/c69_red.png")
+			purple: generateComponents("/images/c69_purple.png")
+		minibot:
+			green: generateComponents("/images/minibot_green.png")
+			grey: generateComponents("/images/minibot_grey.png")
+			blue: generateComponents("/images/minibot_blue.png")
+			golden: generateComponents("/images/minibot_golden.png")
+			red: generateComponents("/images/minibot_red.png")
+			purple: generateComponents("/images/minibot_purple.png")
+
 class Enemy extends Entity
-	constructor: (renderer, textureName) ->
-		super(renderer, "/images/" + textureName + ".png")
+	constructor: (renderer, components) ->
+		super(renderer)
+		@createMesh(components.geometry, components.material)
 
 		@movementSpeed = 3 / 1000
 
@@ -25,7 +49,7 @@ class Enemy extends Entity
 
 class C69 extends Enemy
 	constructor: (renderer, @color) ->
-		super(renderer, "c69_" + @color)
+		super(renderer, components.c69[@color])
 		@type = "c69"
 
 	attack: (soundSequence) ->
@@ -37,7 +61,7 @@ class C69 extends Enemy
 
 class Minibot extends Enemy
 	constructor: (renderer, @color) ->
-		super(renderer, "minibot_" + @color)
+		super(renderer, components.minibot[@color])
 		@type = "minibot"
 
 	attack: (soundSequence) ->

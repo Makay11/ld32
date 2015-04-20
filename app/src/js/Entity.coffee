@@ -8,11 +8,16 @@ class Entity
 
 		@maxAnisotropy = renderer.getMaxAnisotropy()
 
-		@texture = @loadTexture(@textureURL)
-		@texture.repeat.x = 1 / @horizontalTiles
+		if @textureURL
+			@texture = @loadTexture(@textureURL)
+			@texture.repeat.x = 1 / @horizontalTiles
 
-		@geometry = new THREE.PlaneBufferGeometry(@width, @height)
-		@material = new THREE.MeshBasicMaterial(map: @texture)
+			@geometry = new THREE.PlaneBufferGeometry(@width, @height)
+			@material = new THREE.MeshBasicMaterial(map: @texture)
+
+			@createMesh(@geometry, @material)
+
+	createMesh: (@geometry, @material) ->
 		@mesh = new THREE.Mesh(@geometry, @material)
 
 		@mesh.position.z = @height / 2
