@@ -37,35 +37,64 @@ $(function() {
 
 Road = (function() {
   function Road(scene, renderer) {
-    var i, j, tile;
-    this.geometry = new THREE.PlaneBufferGeometry(6, 20);
-    this.texture = THREE.ImageUtils.loadTexture("/images/road.png");
-    this.texture.minFilter = THREE.LinearFilter;
-    this.texture.anisotropy = renderer.getMaxAnisotropy();
-    this.material = new THREE.MeshBasicMaterial({
-      map: this.texture
+    var array, geometry, i, index, j, k, l, len, material, ref, ref1, ref2, texture, tile;
+    this.tiles = 4;
+    this.roadTiles = [];
+    this.leftSideWalkTiles = [];
+    this.rightSideWalkTiles = [];
+    geometry = new THREE.PlaneBufferGeometry(6, 20);
+    texture = THREE.ImageUtils.loadTexture("/images/road.png");
+    texture.minFilter = THREE.LinearFilter;
+    texture.anisotropy = renderer.getMaxAnisotropy();
+    material = new THREE.MeshBasicMaterial({
+      map: texture
     });
-    this.tiles = [];
-    for (i = j = 0; j < 4; i = ++j) {
-      tile = new THREE.Mesh(this.geometry, this.material);
+    for (i = j = 0, ref = this.tiles; 0 <= ref ? j < ref : j > ref; i = 0 <= ref ? ++j : --j) {
+      tile = new THREE.Mesh(geometry, material);
       tile.position.y = i * 20;
-      this.tiles.push(tile);
+      this.roadTiles.push(tile);
       scene.add(tile);
+    }
+    geometry = new THREE.PlaneBufferGeometry(1.5, 20);
+    texture = THREE.ImageUtils.loadTexture("/images/sidewalk.png");
+    texture.minFilter = THREE.LinearFilter;
+    texture.anisotropy = renderer.getMaxAnisotropy();
+    material = new THREE.MeshBasicMaterial({
+      map: texture
+    });
+    ref1 = [this.leftSideWalkTiles, this.rightSideWalkTiles];
+    for (index = k = 0, len = ref1.length; k < len; index = ++k) {
+      array = ref1[index];
+      for (i = l = 0, ref2 = this.tiles; 0 <= ref2 ? l < ref2 : l > ref2; i = 0 <= ref2 ? ++l : --l) {
+        tile = new THREE.Mesh(geometry, material);
+        tile.position.x = -3 - 1.5 / 2 + index * (6 + 1.5);
+        tile.position.y = i * 20;
+        array.push(tile);
+        scene.add(tile);
+      }
     }
   }
 
   Road.prototype.update = function(delta) {
-    var j, len, ref, results, tile;
-    ref = this.tiles;
+    var array, j, len, ref, results, tile;
+    ref = [this.roadTiles, this.leftSideWalkTiles, this.rightSideWalkTiles];
     results = [];
     for (j = 0, len = ref.length; j < len; j++) {
-      tile = ref[j];
-      tile.position.y -= 3 / 1000 * delta;
-      if (tile.position.y <= -20) {
-        results.push(tile.position.y += this.tiles.length * 20);
-      } else {
-        results.push(void 0);
-      }
+      array = ref[j];
+      results.push((function() {
+        var k, len1, results1;
+        results1 = [];
+        for (k = 0, len1 = array.length; k < len1; k++) {
+          tile = array[k];
+          tile.position.y -= 3 / 1000 * delta;
+          if (tile.position.y <= -20) {
+            results1.push(tile.position.y += this.tiles * 20);
+          } else {
+            results1.push(void 0);
+          }
+        }
+        return results1;
+      }).call(this));
     }
     return results;
   };
@@ -94,9 +123,9 @@ Entity = (function() {
     }
   }
 
-  Entity.prototype.createMesh = function(geometry1, material) {
+  Entity.prototype.createMesh = function(geometry1, material1) {
     this.geometry = geometry1;
-    this.material = material;
+    this.material = material1;
     this.mesh = new THREE.Mesh(this.geometry, this.material);
     this.mesh.position.z = this.height / 2;
     this.mesh.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2);
