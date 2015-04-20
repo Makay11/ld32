@@ -107,7 +107,7 @@ class GameManager
 						clearTimeout(@musicTimeout)
 					callback = ->
 						@music.play()
-						@musicTimeout = setTimeout(callback, 5 * 60 * 1000 + 43 * 1000)
+						@musicTimeout = setTimeout(callback, 5 * 60 * 1000 + 43 * 1000 + 3000)
 
 				@music = AudioFX("/audio/Cottonmouth_Timeshift.mp3", options, callback)
 		else if not @paused
@@ -141,11 +141,12 @@ class GameManager
 					@player.moveRight()
 			@movementQueue.splice(0, 1)
 
+		@buildings.update(delta)
+
 		@player.update(delta)
 
-		@enemyManager.update(delta, @player, @camera)
-
-		@buildings.update(delta)
+		if @enemyManager.update(delta, @player, @camera)
+			@music?.stop()
 
 	render: ->
 		if @paused then return

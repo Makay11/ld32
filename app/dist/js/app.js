@@ -248,6 +248,13 @@ Player = (function(superClass) {
     return $(".energy").width(this.energy + "%");
   };
 
+  Player.prototype.reset = function() {
+    this.setRunning();
+    this.updateEnergy(100);
+    this.position = 0;
+    return this.mesh.position.x = 0;
+  };
+
   return Player;
 
 })(Entity);
@@ -369,7 +376,7 @@ GameManager = (function() {
           }
           callback = function() {
             this.music.play();
-            return this.musicTimeout = setTimeout(callback, 5 * 60 * 1000 + 43 * 1000);
+            return this.musicTimeout = setTimeout(callback, 5 * 60 * 1000 + 43 * 1000 + 3000);
           };
         }
         return this.music = AudioFX("/audio/Cottonmouth_Timeshift.mp3", options, callback);
@@ -400,6 +407,7 @@ GameManager = (function() {
   };
 
   GameManager.prototype.update = function(delta) {
+    var ref;
     if (this.paused) {
       return;
     }
@@ -414,9 +422,11 @@ GameManager = (function() {
       }
       this.movementQueue.splice(0, 1);
     }
+    this.buildings.update(delta);
     this.player.update(delta);
-    this.enemyManager.update(delta, this.player, this.camera);
-    return this.buildings.update(delta);
+    if (this.enemyManager.update(delta, this.player, this.camera)) {
+      return (ref = this.music) != null ? ref.stop() : void 0;
+    }
   };
 
   GameManager.prototype.render = function() {
@@ -504,7 +514,8 @@ EnemyManager = (function() {
   };
 
   EnemyManager.prototype.update = function(delta, player, camera) {
-    var canCollide, enemy, enemyDied, enemyX, index, j, len, playerX, ref;
+    var canCollide, dead, enemy, enemyDied, enemyX, index, j, len, playerX, ref;
+    dead = false;
     ref = this.liveEnemies;
     for (index = j = 0, len = ref.length; j < len; index = ++j) {
       enemy = ref[index];
@@ -517,7 +528,7 @@ EnemyManager = (function() {
         playerX = player.mesh.position.x;
         if (enemyX - enemy.width / 2 <= playerX + player.width / 2 && playerX - player.width / 2 <= enemyX + enemy.width / 2) {
           enemy.collided = true;
-          console.log("ded");
+          dead = true;
         }
       }
       if (enemy.mesh.position.y <= camera.position.y) {
@@ -531,7 +542,8 @@ EnemyManager = (function() {
         return !!o;
       });
     }
-    return this.handleSpawn(delta);
+    this.handleSpawn(delta);
+    return dead;
   };
 
   EnemyManager.prototype.handleSpawn = function(delta) {

@@ -51,6 +51,8 @@ class EnemyManager
 			enemy.render(camera)
 
 	update: (delta, player, camera) ->
+		dead = false
+
 		for enemy, index in @liveEnemies
 			if not enemy.collided and enemy.mesh.position.y > 0
 				canCollide = true
@@ -62,7 +64,7 @@ class EnemyManager
 				playerX = player.mesh.position.x
 				if enemyX - enemy.width / 2 <= playerX + player.width / 2 and playerX - player.width / 2 <= enemyX + enemy.width / 2
 					enemy.collided = true
-					console.log "ded"
+					dead = true
 
 			if enemy.mesh.position.y <= camera.position.y
 				enemyDied = true
@@ -73,6 +75,8 @@ class EnemyManager
 			@liveEnemies = @liveEnemies.filter (o) -> !!o
 
 		@handleSpawn(delta)
+
+		dead
 
 	handleSpawn: (delta) ->
 		@nextSpawn -= delta or 0

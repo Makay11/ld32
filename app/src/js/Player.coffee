@@ -69,3 +69,9 @@ class Player extends Entity
 			@energy = 0
 
 		$(".energy").width(@energy + "%")
+
+	reset: ->
+		@setRunning()
+		@updateEnergy(100)
+		@position = 0
+		@mesh.position.x = 0
