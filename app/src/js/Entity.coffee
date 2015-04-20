@@ -19,12 +19,17 @@ class Entity
 
 		@mesh.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2)
 
+		THREEx.Transparency.init([@mesh])
+
 	update: (delta) ->
 		if @horizontalTiles > 1
 			@animationTimer += delta or 0
 			if @animationTimer >= @animationDuration
 				@animationTimer -= @animationDuration
 				@texture.offset.x = (@texture.offset.x + 1 / @horizontalTiles) % 1
+
+	render: (camera) ->
+		THREEx.Transparency.update([@mesh], camera)
 
 	reset: ->
 
@@ -39,3 +44,4 @@ class Entity
 		@texture.offset.x = 0
 		@material.map = @texture
 		@animationTimer = 0
+		THREEx.Transparency.init([@mesh])

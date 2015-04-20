@@ -1,8 +1,8 @@
 #= require Entity
 
 class Enemy extends Entity
-	constructor: (renderer, textureURL) ->
-		super(renderer, textureURL)
+	constructor: (renderer, textureName) ->
+		super(renderer, "/images/" + textureName + ".png")
 
 		@movementSpeed = 3 / 1000
 
@@ -21,9 +21,12 @@ class Enemy extends Entity
 
 	attack: (soundSequence) -> 0
 
-class Enemy_C69 extends Enemy
-	constructor: (renderer) ->
-		super(renderer, "/images/c69.png")
+	type: -> null
+
+class C69 extends Enemy
+	constructor: (renderer, @color) ->
+		super(renderer, "c69_" + @color)
+		@type = "c69"
 
 	attack: (soundSequence) ->
 		if (length = soundSequence.length) >= 3
@@ -32,9 +35,10 @@ class Enemy_C69 extends Enemy
 				return 20
 		return 0
 
-class Enemy_Minibot extends Enemy
-	constructor: (renderer) ->
-		super(renderer, "/images/minibot.png")
+class Minibot extends Enemy
+	constructor: (renderer, @color) ->
+		super(renderer, "minibot_" + @color)
+		@type = "minibot"
 
 	attack: (soundSequence) ->
 		if (length = soundSequence.length) >= 2

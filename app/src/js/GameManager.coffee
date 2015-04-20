@@ -13,15 +13,7 @@ class GameManager
 
 		@paused = true
 
-		@enemies = []
-
-		@enemyPool = []
-
-		@transparentObjects = []
-
 		@movementQueue = []
-
-		@nextSpawn = 0
 
 		@soundSequence = []
 
@@ -36,11 +28,7 @@ class GameManager
 		@player = new Player(@renderer)
 		@scene.add(@player.mesh)
 
-		@addTransparentObject(@player)
-
-	addTransparentObject: (o) ->
-		@transparentObjects.push(o.mesh)
-		THREEx.Transparency.init(@transparentObjects)
+		@enemyManager = new EnemyManager(@renderer, @scene)
 
 	resize: (width, height) ->
 		@width = width or window.innerWidth
@@ -72,23 +60,14 @@ class GameManager
 		@soundSequence.push(key)
 
 		if not @player.moving
-			for enemy, index in @enemies
-				if enemy.mesh.position.x == @player.mesh.position.x
-					if energy = enemy.attack(@soundSequence)
-						@enemies.splice(index, 1)
-						@enemyPool.push(enemy)
-						@scene.remove(enemy.mesh)
-						enemy.reset()
-
-						@player.updateEnergy(energy)
-						$(".score .text").text(parseInt($(".score .text").text()) + energy)
-						$(".monstersKilled .text").text(parseInt($(".monstersKilled .text").text()) + 1)
-					break
+			@enemyManager.attack(@player, @soundSequence)
 
 	render: ->
 		if @paused then return
 
-		THREEx.Transparency.update(@transparentObjects, @camera)
+		@enemyManager.render(@camera)
+		@player.render(@camera)
+
 		@renderer.render(@scene, @camera)
 
 	update: (delta) ->
@@ -106,40 +85,4 @@ class GameManager
 
 		@player.update(delta)
 
-		for enemy, index in @enemies
-			if not enemy.collided and enemy.mesh.position.y > 0
-				canCollide = true
-
-			enemy.update(delta)
-
-			if canCollide and enemy.mesh.position.y < 0.2
-				enemyX = enemy.mesh.position.x
-				playerX = @player.mesh.position.x
-				if enemyX - enemy.width / 2 <= playerX + @player.width / 2 and playerX - @player.width / 2 <= enemyX + enemy.width / 2
-					enemy.collided = true
-					console.log "ded"
-
-			if enemy.mesh.position.y <= @camera.position.y
-				@enemies[index] = null
-				@enemyPool.push(enemy)
-				@scene.remove(enemy.mesh)
-
-		@enemies = @enemies.filter (o) -> !!o
-
-		@nextSpawn -= delta or 0
-		if @nextSpawn <= 0
-			if @enemyPool.length > 0
-				enemy = @enemyPool.pop()
-				enemy.reset()
-			else
-				if Math.random() < 0.7
-					enemy = new Enemy_Minibot(@renderer)
-				else
-					enemy = new Enemy_C69(@renderer)
-				@addTransparentObject(enemy)
-			@enemies.push(enemy)
-			@scene.add(enemy.mesh)
-			@generateNextSpawn()
-
-	generateNextSpawn: ->
-		@nextSpawn = Math.random() * 2 * 1000 // 1
+		@enemyManager.update(delta, @player, @camera)
