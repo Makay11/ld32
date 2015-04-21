@@ -59,7 +59,7 @@ class Buildings
 
 	update: (delta) ->
 		for building, index in @buildings
-			building.mesh.position.y -= 3 / 1000 * delta
+			building.mesh.position.y -= MS / 1000 * delta
 			if building.mesh.position.y <= @width / 2 - (@width + @interval)
 				removedBuilding = true
 				@buildings[index] = null

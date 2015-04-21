@@ -84,7 +84,7 @@ class EnemyManager
 			@nextSpawn = @generateNextSpawn()
 			@spawnEnemy()
 
-	generateNextSpawn: -> (Math.random() * 1.5 + 0.5) * 1000 // 1
+	generateNextSpawn: -> (Math.random() * 0.75 + 0.25) * 1000 // 1
 
 	spawnEnemy: ->
 		r = Math.random()

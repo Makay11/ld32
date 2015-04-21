@@ -7,6 +7,8 @@ keyCodes =
 	3: 51
 	4: 52
 
+MS = 8
+
 $ ->
 	gameManager = new GameManager()
 

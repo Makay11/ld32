@@ -36,6 +36,6 @@ class Road
 	update: (delta) ->
 		for array in [@roadTiles, @leftSideWalkTiles, @rightSideWalkTiles]
 			for tile in array
-				tile.position.y -= 3 / 1000 * delta
+				tile.position.y -= MS / 1000 * delta
 				if tile.position.y <= -20
 					tile.position.y += @tiles * 20

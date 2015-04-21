@@ -32,7 +32,7 @@ class Enemy extends Entity
 		super(renderer)
 		@createMesh(components.geometry, components.material)
 
-		@movementSpeed = 3 / 1000
+		@movementSpeed = MS / 1000
 
 		@collided = false
 
@@ -54,12 +54,15 @@ class Enemy extends Entity
 		return 0
 
 	matchSequence: (soundSequence) ->
-		if (length = soundSequence.length) >= @sequence.length
-			for sound, index in @sequence
-				if not soundSequence[length - @sequence.length + index] == sound
-					return false
-			return true
-		return false
+		length = soundSequence.length
+		if length < @sequence.length
+			return false
+
+		for sound, index in @sequence
+			if soundSequence[length - @sequence.length + index] != sound
+				return false
+
+		return true
 
 class C69 extends Enemy
 	constructor: (renderer, @color) ->
