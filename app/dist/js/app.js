@@ -182,7 +182,7 @@ Player = (function(superClass) {
     this.position = 0;
     this.runningSprite = this.texture;
     this.runningSpriteTiles = 8;
-    this.runningAnimationDuration = 300 / this.runningSpriteTiles;
+    this.runningAnimationDuration = 100 / this.runningSpriteTiles;
     this.setRunning();
     this.jumpSpriteTiles = 6;
     this.jumpAnimationDuration = 300 / this.jumpSpriteTiles;
