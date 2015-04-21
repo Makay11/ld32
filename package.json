@@ -1,7 +1,7 @@
 {
-  "name": "webapp-boilerplate",
+  "name": "sound-runner",
   "version": "1.0.0",
-  "description": "Web App Boilerplate",
+  "description": "Sound Runner",
   "main": "server.js",
   "dependencies": {
     "hapi": "^8.4.0"
@@ -20,12 +20,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Makay11/webapp-boilerplate"
+    "url": "https://github.com/Makay11/ld32"
   },
-  "author": "Diogo Pais (Makay11)",
+  "author": "Diogo Pais (Makay11), André Domingues (voxivoid) and Francisco Gonçalves (franciscocgoncalves)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Makay11/webapp-boilerplate/issues"
+    "url": "https://github.com/Makay11/ld32/issues"
   },
-  "homepage": "https://github.com/Makay11/webapp-boilerplate"
+  "homepage": "http://ld32.diogopais.com"
 }
