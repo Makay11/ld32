@@ -1,6 +1,11 @@
 # Sound Runner
 Game developed in 72 hours for the Ludum Dare 32 Jam.
 
+# Instructions
+To play the game you can visit the [website](http://ld32.diogopais.com) or clone the repository, enter the directory, write `npm i --production` in the terminal, followed by `npm start` and you can then play at [http://localhost:6900](http://localhost:6900).
+
+To develop you can use the development mode by writing `npm i` instead, followed by `npm run dev`. In this mode everything will autocompile but it will not work on Windows.
+
 # Credits
 All credits go to Diogo Pais and Francisco Gonçalves for the code, André Domingues for the amazing textures and Cottonmouth for creating the awesome music we used in this game as Creative Commons.
 
