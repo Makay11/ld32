@@ -624,17 +624,17 @@ EnemyManager = (function() {
   };
 
   EnemyManager.prototype.attack = function(player, soundSequence) {
-    var enemy, energy, index, j, len, ref, results;
+    var enemy, index, j, len, ref, results, score;
     ref = this.liveEnemies;
     results = [];
     for (index = j = 0, len = ref.length; j < len; index = ++j) {
       enemy = ref[index];
       if (enemy.mesh.position.y > 0 && enemy.mesh.position.x === player.mesh.position.x) {
-        if (energy = enemy.attack(soundSequence)) {
+        if (score = enemy.attack(soundSequence)) {
           this.liveEnemies.splice(index, 1);
           this.stashEnemy(enemy);
-          player.updateEnergy(energy);
-          $(".score .text").text(parseInt($(".score .text").text()) + energy);
+          player.updateEnergy(20);
+          $(".score .text").text(parseInt($(".score .text").text()) + score);
           $(".monstersKilled .text").text(parseInt($(".monstersKilled .text").text()) + 1);
         }
         break;
@@ -743,7 +743,26 @@ C69 = (function(superClass) {
     C69.__super__.constructor.call(this, renderer, components.c69[this.color]);
     this.type = "c69";
     this.score = 20;
-    this.sequence = [keyCodes[1], keyCodes[2], keyCodes[1]];
+    switch (this.color) {
+      case "grey":
+        this.score *= 1;
+        this.sequence = "1 2 3";
+        break;
+      case "golden":
+        this.score *= 4;
+        this.sequence = "1 2 1";
+        break;
+      case "red":
+        this.score *= 2;
+        this.sequence = "1 3 2";
+        break;
+      case "purple":
+        this.score *= 3;
+        this.sequence = "1 4 2";
+    }
+    this.sequence = this.sequence.split(" ").map(function(n) {
+      return keyCodes[n];
+    });
   }
 
   return C69;
@@ -758,7 +777,34 @@ Minibot = (function(superClass) {
     Minibot.__super__.constructor.call(this, renderer, components.minibot[this.color]);
     this.type = "minibot";
     this.score = 10;
-    this.sequence = [keyCodes[1], keyCodes[3]];
+    switch (this.color) {
+      case "green":
+        this.score *= 1 / 2;
+        this.sequence = "1";
+        break;
+      case "grey":
+        this.score *= 1;
+        this.sequence = "1 2";
+        break;
+      case "blue":
+        this.score *= 2;
+        this.sequence = "1 3";
+        break;
+      case "golden":
+        this.score *= 5;
+        this.sequence = "3 1";
+        break;
+      case "red":
+        this.score *= 3;
+        this.sequence = "1 4";
+        break;
+      case "purple":
+        this.score *= 4;
+        this.sequence = "4 2";
+    }
+    this.sequence = this.sequence.split(" ").map(function(n) {
+      return keyCodes[n];
+    });
   }
 
   return Minibot;

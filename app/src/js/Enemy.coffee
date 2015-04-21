@@ -70,7 +70,22 @@ class C69 extends Enemy
 		@type = "c69"
 
 		@score = 20
-		@sequence = [keyCodes[1], keyCodes[2], keyCodes[1]]
+
+		switch @color
+			when "grey"
+				@score *= 1
+				@sequence = "1 2 3"
+			when "golden"
+				@score *= 4
+				@sequence = "1 2 1"
+			when "red"
+				@score *= 2
+				@sequence = "1 3 2"
+			when "purple"
+				@score *= 3
+				@sequence = "1 4 2"
+
+		@sequence = @sequence.split(" ").map (n) -> keyCodes[n]
 
 class Minibot extends Enemy
 	constructor: (renderer, @color) ->
@@ -78,7 +93,28 @@ class Minibot extends Enemy
 		@type = "minibot"
 
 		@score = 10
-		@sequence = [keyCodes[1], keyCodes[3]]
+
+		switch @color
+			when "green"
+				@score *= 1/2
+				@sequence = "1"
+			when "grey"
+				@score *= 1
+				@sequence = "1 2"
+			when "blue"
+				@score *= 2
+				@sequence = "1 3"
+			when "golden"
+				@score *= 5
+				@sequence = "3 1"
+			when "red"
+				@score *= 3
+				@sequence = "1 4"
+			when "purple"
+				@score *= 4
+				@sequence = "4 2"
+
+		@sequence = @sequence.split(" ").map (n) -> keyCodes[n]
 
 class Barrier extends Enemy
 	constructor: (renderer, @kind) ->

@@ -139,11 +139,11 @@ class EnemyManager
 	attack: (player, soundSequence) ->
 		for enemy, index in @liveEnemies
 			if enemy.mesh.position.y > 0 and enemy.mesh.position.x == player.mesh.position.x
-				if energy = enemy.attack(soundSequence)
+				if score = enemy.attack(soundSequence)
 					@liveEnemies.splice(index, 1)
 					@stashEnemy(enemy)
 
-					player.updateEnergy(energy)
-					$(".score .text").text(parseInt($(".score .text").text()) + energy)
+					player.updateEnergy(20)
+					$(".score .text").text(parseInt($(".score .text").text()) + score)
 					$(".monstersKilled .text").text(parseInt($(".monstersKilled .text").text()) + 1)
 				break
