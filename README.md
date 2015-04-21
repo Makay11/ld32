@@ -1,5 +1,8 @@
-# Web App Boilerplate
-Details coming soon...
+# Sound Runner
+Game developed in 72 hours for the Ludum Dare 32 Jam.
+
+# Credits
+All credits go to Diogo Pais and Francisco Gonçalves for the code, André Domingues for the amazing textures and Cottonmouth for creating the awesome music we used in this game as Creative Commons.
 
 # License
 The MIT License (MIT)
