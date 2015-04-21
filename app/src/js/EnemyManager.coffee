@@ -53,6 +53,7 @@ class EnemyManager
 	update: (delta, player, camera) ->
 		dead = false
 
+		wasSet = false
 		for enemy, index in @liveEnemies
 			if not enemy.collided and enemy.mesh.position.y > 0
 				canCollide = true
@@ -70,6 +71,11 @@ class EnemyManager
 				enemyDied = true
 				@liveEnemies[index] = null
 				@stashEnemy(enemy)
+				
+			if !wasSet && enemy.mesh.position.y > 0 and enemy.mesh.position.x == player.mesh.position.x
+				$(".sequenceOverlay .text").text(enemy.sequenceText)
+				wasSet = true
+
 
 		if enemyDied
 			@liveEnemies = @liveEnemies.filter (o) -> !!o
