@@ -12,14 +12,30 @@ canvas {
   height: 3%;
   position: fixed;
   top: 10px;
-  right: 39%;
+  right: 49%;
   background: #ccc;
   padding: 5px;
+  margin-right: 1%;
 }
 .hud .energyMeter .energy {
   width: 0%;
   height: 100%;
   background-color: #0af;
+}
+.hud .sequenceOverlay {
+  width: 20%;
+  height: 3%;
+  position: fixed;
+  top: 10px;
+  right: 29%;
+  background: #ccc;
+  padding: 5px;
+}
+.hud .sequenceOverlay .text {
+  font-weight: bold;
+  font-size: 30px;
+  height: 30px;
+  line-height: 30px;
 }
 .hud .scores {
   position: fixed;

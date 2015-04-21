@@ -68,7 +68,7 @@ class C69 extends Enemy
 	constructor: (renderer, @color) ->
 		super(renderer, components.c69[@color])
 		@type = "c69"
-
+		@sequenceText = ""
 		@score = 20
 
 		switch @color
@@ -85,13 +85,14 @@ class C69 extends Enemy
 				@score *= 3
 				@sequence = "1 4 2"
 
+		@sequenceText = @sequence
 		@sequence = @sequence.split(" ").map (n) -> keyCodes[n]
 
 class Minibot extends Enemy
 	constructor: (renderer, @color) ->
 		super(renderer, components.minibot[@color])
 		@type = "minibot"
-
+		@sequenceText = ""
 		@score = 10
 
 		switch @color
@@ -114,6 +115,7 @@ class Minibot extends Enemy
 				@score *= 4
 				@sequence = "4 2"
 
+		@sequenceText = @sequence
 		@sequence = @sequence.split(" ").map (n) -> keyCodes[n]
 
 class Barrier extends Enemy

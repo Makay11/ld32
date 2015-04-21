@@ -527,8 +527,9 @@ EnemyManager = (function() {
   };
 
   EnemyManager.prototype.update = function(delta, player, camera) {
-    var canCollide, dead, enemy, enemyDied, enemyX, index, j, len, playerX, ref;
+    var canCollide, dead, enemy, enemyDied, enemyX, index, j, len, playerX, ref, wasSet;
     dead = false;
+    wasSet = false;
     ref = this.liveEnemies;
     for (index = j = 0, len = ref.length; j < len; index = ++j) {
       enemy = ref[index];
@@ -548,6 +549,10 @@ EnemyManager = (function() {
         enemyDied = true;
         this.liveEnemies[index] = null;
         this.stashEnemy(enemy);
+      }
+      if (!wasSet && enemy.mesh.position.y > 0 && enemy.mesh.position.x === player.mesh.position.x) {
+        $(".sequenceOverlay .text").text(enemy.sequenceText);
+        wasSet = true;
       }
     }
     if (enemyDied) {
@@ -742,6 +747,7 @@ C69 = (function(superClass) {
     this.color = color;
     C69.__super__.constructor.call(this, renderer, components.c69[this.color]);
     this.type = "c69";
+    this.sequenceText = "";
     this.score = 20;
     switch (this.color) {
       case "grey":
@@ -760,6 +766,7 @@ C69 = (function(superClass) {
         this.score *= 3;
         this.sequence = "1 4 2";
     }
+    this.sequenceText = this.sequence;
     this.sequence = this.sequence.split(" ").map(function(n) {
       return keyCodes[n];
     });
@@ -776,6 +783,7 @@ Minibot = (function(superClass) {
     this.color = color;
     Minibot.__super__.constructor.call(this, renderer, components.minibot[this.color]);
     this.type = "minibot";
+    this.sequenceText = "";
     this.score = 10;
     switch (this.color) {
       case "green":
@@ -802,6 +810,7 @@ Minibot = (function(superClass) {
         this.score *= 4;
         this.sequence = "4 2";
     }
+    this.sequenceText = this.sequence;
     this.sequence = this.sequence.split(" ").map(function(n) {
       return keyCodes[n];
     });
