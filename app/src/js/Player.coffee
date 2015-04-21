@@ -54,7 +54,7 @@ class Player extends Entity
 					@mesh.position.x = @position
 					@setRunning()
 
-		@updateEnergy(-10 / 1000 * delta)
+		return @updateEnergy(-10 / 1000 * delta)
 
 	setRunning: ->
 		@setTexture(@runningSprite, @runningSpriteTiles, @runningAnimationDuration)
@@ -69,6 +69,8 @@ class Player extends Entity
 			@energy = 0
 
 		$(".energy").width(@energy + "%")
+
+		return @energy
 
 	reset: ->
 		@setRunning()

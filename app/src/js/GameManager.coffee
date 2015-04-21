@@ -96,6 +96,8 @@ class GameManager
 
 			if @paused
 				@music.stop()
+				if @musicTimeout
+					clearTimeout(@musicTimeout)
 			else if @music
 				@music.play()
 			else if AudioFX.supported.mp3
@@ -146,9 +148,11 @@ class GameManager
 
 		@buildings.update(delta)
 
-		@player.update(delta)
+		energy = @player.update(delta)
 
-		if @enemyManager.update(delta, @player, @camera)
+		dead = @enemyManager.update(delta, @player, @camera)
+
+		if not energy or dead
 			@paused = true
 			@gameOver = true
 			@music?.stop()

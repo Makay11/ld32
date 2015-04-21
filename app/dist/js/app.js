@@ -245,7 +245,8 @@ Player = (function(superClass) {
     } else if (this.energy < 0) {
       this.energy = 0;
     }
-    return $(".energy").width(this.energy + "%");
+    $(".energy").width(this.energy + "%");
+    return this.energy;
   };
 
   Player.prototype.reset = function() {
@@ -364,7 +365,10 @@ GameManager = (function() {
         this.paused = !this.paused;
       }
       if (this.paused) {
-        return this.music.stop();
+        this.music.stop();
+        if (this.musicTimeout) {
+          return clearTimeout(this.musicTimeout);
+        }
       } else if (this.music) {
         return this.music.play();
       } else if (AudioFX.supported.mp3) {
@@ -411,7 +415,7 @@ GameManager = (function() {
   };
 
   GameManager.prototype.update = function(delta) {
-    var ref;
+    var dead, energy, ref;
     if (this.paused) {
       return;
     }
@@ -427,8 +431,9 @@ GameManager = (function() {
       this.movementQueue.splice(0, 1);
     }
     this.buildings.update(delta);
-    this.player.update(delta);
-    if (this.enemyManager.update(delta, this.player, this.camera)) {
+    energy = this.player.update(delta);
+    dead = this.enemyManager.update(delta, this.player, this.camera);
+    if (!energy || dead) {
       this.paused = true;
       this.gameOver = true;
       return (ref = this.music) != null ? ref.stop() : void 0;
@@ -701,11 +706,26 @@ Enemy = (function(superClass) {
   };
 
   Enemy.prototype.attack = function(soundSequence) {
+    if (this.matchSequence(soundSequence)) {
+      soundSequence.splice(0, soundSequence.length);
+      return this.score;
+    }
     return 0;
   };
 
-  Enemy.prototype.type = function() {
-    return null;
+  Enemy.prototype.matchSequence = function(soundSequence) {
+    var index, j, len, length, ref, sound;
+    if ((length = soundSequence.length) >= this.sequence.length) {
+      ref = this.sequence;
+      for (index = j = 0, len = ref.length; j < len; index = ++j) {
+        sound = ref[index];
+        if (!soundSequence[length - this.sequence.length + index] === sound) {
+          return false;
+        }
+      }
+      return true;
+    }
+    return false;
   };
 
   return Enemy;
@@ -719,18 +739,9 @@ C69 = (function(superClass) {
     this.color = color;
     C69.__super__.constructor.call(this, renderer, components.c69[this.color]);
     this.type = "c69";
+    this.score = 20;
+    this.sequence = [keyCodes[1], keyCodes[2], keyCodes[1]];
   }
-
-  C69.prototype.attack = function(soundSequence) {
-    var length;
-    if ((length = soundSequence.length) >= 3) {
-      if (soundSequence[length - 3] === keyCodes[1] && soundSequence[length - 2] === keyCodes[2] && soundSequence[length - 1] === keyCodes[1]) {
-        soundSequence.splice(0, length);
-        return 20;
-      }
-    }
-    return 0;
-  };
 
   return C69;
 
@@ -743,18 +754,9 @@ Minibot = (function(superClass) {
     this.color = color;
     Minibot.__super__.constructor.call(this, renderer, components.minibot[this.color]);
     this.type = "minibot";
+    this.score = 10;
+    this.sequence = [keyCodes[1], keyCodes[3]];
   }
-
-  Minibot.prototype.attack = function(soundSequence) {
-    var length;
-    if ((length = soundSequence.length) >= 2) {
-      if (soundSequence[length - 2] === keyCodes[1] && soundSequence[length - 1] === keyCodes[3]) {
-        soundSequence.splice(0, length);
-        return 10;
-      }
-    }
-    return 0;
-  };
 
   return Minibot;
 
@@ -768,6 +770,10 @@ Barrier = (function(superClass) {
     Barrier.__super__.constructor.call(this, renderer, components.barrier[this.kind]);
     this.type = "barrier";
   }
+
+  Barrier.prototype.attack = function() {
+    return 0;
+  };
 
   return Barrier;
 

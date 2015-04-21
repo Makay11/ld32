@@ -47,35 +47,39 @@ class Enemy extends Entity
 		@mesh.position.y = 25
 		@collided = false
 
-	attack: (soundSequence) -> 0
+	attack: (soundSequence) ->
+		if @matchSequence(soundSequence)
+			soundSequence.splice(0, soundSequence.length)
+			return @score
+		return 0
 
-	type: -> null
+	matchSequence: (soundSequence) ->
+		if (length = soundSequence.length) >= @sequence.length
+			for sound, index in @sequence
+				if not soundSequence[length - @sequence.length + index] == sound
+					return false
+			return true
+		return false
 
 class C69 extends Enemy
 	constructor: (renderer, @color) ->
 		super(renderer, components.c69[@color])
 		@type = "c69"
 
-	attack: (soundSequence) ->
-		if (length = soundSequence.length) >= 3
-			if soundSequence[length-3] == keyCodes[1] and soundSequence[length-2] == keyCodes[2] and soundSequence[length-1] == keyCodes[1]
-				soundSequence.splice(0, length)
-				return 20
-		return 0
+		@score = 20
+		@sequence = [keyCodes[1], keyCodes[2], keyCodes[1]]
 
 class Minibot extends Enemy
 	constructor: (renderer, @color) ->
 		super(renderer, components.minibot[@color])
 		@type = "minibot"
 
-	attack: (soundSequence) ->
-		if (length = soundSequence.length) >= 2
-			if soundSequence[length-2] == keyCodes[1] and soundSequence[length-1] == keyCodes[3]
-				soundSequence.splice(0, length)
-				return 10
-		return 0
+		@score = 10
+		@sequence = [keyCodes[1], keyCodes[3]]
 
 class Barrier extends Enemy
 	constructor: (renderer, @kind) ->
 		super(renderer, components.barrier[@kind])
 		@type = "barrier"
+
+	attack: -> 0
