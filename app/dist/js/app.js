@@ -358,7 +358,11 @@ GameManager = (function() {
     var callback, key, options;
     key = event.keyCode;
     if (key === keyCodes.space) {
-      this.paused = !this.paused;
+      if (this.gameOver) {
+        location.reload();
+      } else {
+        this.paused = !this.paused;
+      }
       if (this.paused) {
         return this.music.stop();
       } else if (this.music) {
@@ -425,6 +429,8 @@ GameManager = (function() {
     this.buildings.update(delta);
     this.player.update(delta);
     if (this.enemyManager.update(delta, this.player, this.camera)) {
+      this.paused = true;
+      this.gameOver = true;
       return (ref = this.music) != null ? ref.stop() : void 0;
     }
   };

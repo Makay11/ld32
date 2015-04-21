@@ -89,7 +89,10 @@ class GameManager
 		key = event.keyCode
 		#console.log key
 		if key == keyCodes.space
-			@paused = not @paused
+			if @gameOver
+				location.reload()
+			else
+				@paused = not @paused
 
 			if @paused
 				@music.stop()
@@ -146,6 +149,8 @@ class GameManager
 		@player.update(delta)
 
 		if @enemyManager.update(delta, @player, @camera)
+			@paused = true
+			@gameOver = true
 			@music?.stop()
 
 	render: ->
