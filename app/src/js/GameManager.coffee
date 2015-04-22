@@ -94,6 +94,8 @@ class GameManager
 			else
 				@paused = not @paused
 
+			$(".info").toggle()
+
 			if @paused
 				@music.stop()
 				if @musicTimeout
@@ -156,6 +158,7 @@ class GameManager
 			@paused = true
 			@gameOver = true
 			@music?.stop()
+			$(".info").show()
 
 	render: ->
 		@enemyManager.render(@camera)

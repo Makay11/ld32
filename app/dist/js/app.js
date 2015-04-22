@@ -366,6 +366,7 @@ GameManager = (function() {
       } else {
         this.paused = !this.paused;
       }
+      $(".info").toggle();
       if (this.paused) {
         this.music.stop();
         if (this.musicTimeout) {
@@ -438,7 +439,10 @@ GameManager = (function() {
     if (!energy || dead) {
       this.paused = true;
       this.gameOver = true;
-      return (ref = this.music) != null ? ref.stop() : void 0;
+      if ((ref = this.music) != null) {
+        ref.stop();
+      }
+      return $(".info").show();
     }
   };
 
