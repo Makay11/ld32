@@ -10,7 +10,7 @@ class Player extends Entity
 
 		@runningSprite = @texture
 		@runningSpriteTiles = 8
-		@runningAnimationDuration = 100 / @runningSpriteTiles
+		@runningAnimationDuration = 200 / @runningSpriteTiles
 
 		@setRunning()
 

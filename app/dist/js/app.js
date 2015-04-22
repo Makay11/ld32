@@ -182,7 +182,7 @@ Player = (function(superClass) {
     this.position = 0;
     this.runningSprite = this.texture;
     this.runningSpriteTiles = 8;
-    this.runningAnimationDuration = 100 / this.runningSpriteTiles;
+    this.runningAnimationDuration = 200 / this.runningSpriteTiles;
     this.setRunning();
     this.jumpSpriteTiles = 6;
     this.jumpAnimationDuration = 300 / this.jumpSpriteTiles;
@@ -443,9 +443,6 @@ GameManager = (function() {
   };
 
   GameManager.prototype.render = function() {
-    if (this.paused) {
-      return;
-    }
     this.enemyManager.render(this.camera);
     this.player.render(this.camera);
     this.renderMoon(this.camera);

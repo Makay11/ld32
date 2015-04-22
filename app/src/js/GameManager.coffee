@@ -158,8 +158,6 @@ class GameManager
 			@music?.stop()
 
 	render: ->
-		if @paused then return
-
 		@enemyManager.render(@camera)
 		@player.render(@camera)
 
